@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/coordinatorLayout"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical"
+    tools:context="com.ypunval.pcbang.activity.ReviewActivity">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+    </android.support.design.widget.AppBarLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <ScrollView
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="170dp"
+                    android:background="#fff"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:layout_marginTop="15dp"
+                        android:text="서비스 및 시설은 어떠셨나요?"
+                        android:textColor="#333"
+                        android:textSize="14dp" />
+
+                    <TextView
+                        android:id="@+id/tv_rating_point"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="15dp"
+                        android:text="0점"
+                        android:textColor="#ccc"
+                        android:textSize="18dp" />
+
+                    <TextView
+                        android:id="@+id/tv_rating_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="15dp"
+                        android:text="별점을 선택해 주세요."
+                        android:textColor="#ccc"
+                        android:textSize="14dp" />
+
+                    <RatingBar
+                        android:layout_marginTop="15dp"
+                        android:id="@+id/ratingbar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:focusable="true"
+                        android:focusableInTouchMode="true"
+                        android:numStars="5"
+                        android:rating="0.0"
+                        android:soundEffectsEnabled="true"
+                        android:stepSize="0.5" />
+
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="5dp"
+                    android:background="#fff"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:id="@+id/ll_et_review"
+                        android:layout_weight="1">
+
+                        <EditText
+                            android:textColorHint="#ccc"
+                            android:hint="이곳에 이용 후기를 입력해 주세요.\n후기는 업주와 다른 유저에게 큰 도움이 됩니다."
+                            android:id="@+id/et_review"
+                            android:textSize="14dp"
+                            android:background="#fff"
+                            android:lineSpacingExtra="3dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="15dp"
+                            android:layout_marginRight="15dp"
+                            android:layout_marginTop="15dp"
+                            android:layout_weight="1"
+                            android:singleLine="false" />
+                    </LinearLayout>
+
+
+
+
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+        <TextView
+            android:clickable="true"
+            android:id="@+id/tv_register"
+            android:gravity="center"
+            android:textSize="16dp"
+            android:textColor="#fff"
+            android:text="등록하기"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="#cccccc" />
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,32 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="appbar_padding_top">8dp</dimen>
+    <dimen name="text_margin">16dp</dimen>
+
+    <dimen name="custom_profile_image">50dp</dimen>
+    <dimen name="custom_profile_padding">2dp</dimen>
+
+    <dimen name="marker_height">20dp</dimen>
+    <dimen name="marker_padding">8dp</dimen>
+
+
+
+    <dimen name="drawer_width">240dp</dimen>
+    <dimen name="drawer_text">20sp</dimen>
+    <dimen name="title_text">16sp</dimen>
+
+    <dimen name="bt_height">36dp</dimen>
+
+    <dimen name="theme_margin">10dp</dimen>
+    <dimen name="theme_padding">12dp</dimen>
+    <dimen name="theme_height">32dp</dimen>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="nav_header_vertical_spacing">16dp</dimen>
+    <dimen name="nav_header_height">160dp</dimen>
+
+    <!-- MainMapFragment -->
+    <dimen name="my_location_top_margin">90dp</dimen>
+</resources>

@@ -1,0 +1,425 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:clickable="true"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="#ccc" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="40dp"-->
+        <!--android:gravity="center_vertical"-->
+        <!--android:orientation="horizontal"-->
+        <!--android:paddingLeft="5dp"-->
+        <!--android:paddingRight="5dp">-->
+
+        <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:gravity="center_vertical"-->
+        <!--android:orientation="horizontal">-->
+
+        <!--<ImageView-->
+        <!--android:layout_width="32dp"-->
+        <!--android:layout_height="32dp"-->
+        <!--android:src="@drawable/ic_list_64dp" />-->
+
+        <!--<TextView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginLeft="3dp"-->
+        <!--android:text="전체 테마"-->
+        <!--android:textColor="@color/item_text_deep"-->
+        <!--android:textSize="16dp" />-->
+        <!--</LinearLayout>-->
+
+        <!--&lt;!&ndash;<LinearLayout&ndash;&gt;-->
+        <!--&lt;!&ndash;android:id="@+id/ll_theme_conceal"&ndash;&gt;-->
+        <!--&lt;!&ndash;android:layout_width="50"&ndash;&gt;-->
+        <!--&lt;!&ndash;android:layout_height="match_parent"&ndash;&gt;-->
+        <!--&lt;!&ndash;android:background="@drawable/selector"&ndash;&gt;-->
+        <!--&lt;!&ndash;android:gravity="right|center_vertical">&ndash;&gt;-->
+
+        <!--&lt;!&ndash;<ImageView&ndash;&gt;-->
+        <!--&lt;!&ndash;android:layout_width="32dp"&ndash;&gt;-->
+        <!--&lt;!&ndash;android:layout_height="32dp"&ndash;&gt;-->
+        <!--&lt;!&ndash;android:src="@drawable/ic_expand_less_64dp"&ndash;&gt;-->
+        <!--&lt;!&ndash;/>&ndash;&gt;-->
+
+        <!--&lt;!&ndash;</LinearLayout>&ndash;&gt;-->
+        <!--</LinearLayout>-->
+
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingBottom="8dp"
+            android:paddingTop="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_weight="4"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="서비스"
+                    android:textColor="@color/item_text_deep"
+                    android:textSize="14dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:orientation="vertical">
+
+                <com.rey.material.widget.CheckBox
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="서빙"
+                    android:textSize="14dp"
+                    app:v_styleId="@array/checkbox" />
+
+                <com.rey.material.widget.CheckBox
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="무료커피"
+                    android:textColor="@color/item_text_basic"
+                    android:textSize="14dp"
+                    app:v_styleId="@array/checkbox" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="3"
+                android:orientation="vertical">
+
+                <com.rey.material.widget.CheckBox
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="자리조회"
+                    android:textColor="@color/item_text_basic"
+                    android:textSize="14dp"
+                    app:v_styleId="@array/checkbox" />
+
+                <com.rey.material.widget.CheckBox
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="예약"
+                    android:textColor="@color/item_text_basic"
+                    android:textSize="14dp"
+                    app:v_styleId="@array/checkbox" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="#ccc" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingBottom="8dp"
+            android:paddingTop="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="4"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="시설"
+                    android:textColor="@color/item_text_deep"
+                    android:textSize="14dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:orientation="vertical">
+
+                <com.rey.material.widget.CheckBox
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="흡연부스"
+                    android:textColor="@color/item_text_basic"
+                    android:textSize="14dp"
+                    app:v_styleId="@array/checkbox" />
+
+                <com.rey.material.widget.CheckBox
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="주차"
+                    android:textColor="@color/item_text_basic"
+                    android:textSize="14dp"
+                    app:v_styleId="@array/checkbox" />
+
+                <com.rey.material.widget.CheckBox
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="커플석"
+                    android:textColor="@color/item_text_basic"
+                    android:textSize="14dp"
+                    app:v_styleId="@array/checkbox" />
+
+                <com.rey.material.widget.CheckBox
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="FPS 전용석"
+                    android:textColor="@color/item_text_basic"
+                    android:textSize="14dp"
+                    app:v_styleId="@array/checkbox" />
+
+                <com.rey.material.widget.CheckBox
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="음식조리"
+                    android:textColor="@color/item_text_basic"
+                    android:textSize="14dp"
+                    app:v_styleId="@array/checkbox" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="3"
+                android:orientation="vertical">
+
+                <com.rey.material.widget.CheckBox
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="칼라프린터"
+                    android:textColor="@color/item_text_basic"
+                    android:textSize="14dp"
+                    app:v_styleId="@array/checkbox" />
+
+                <com.rey.material.widget.CheckBox
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="흑백프린터"
+                    android:textColor="@color/item_text_basic"
+                    android:textSize="14dp"
+                    app:v_styleId="@array/checkbox" />
+
+                <com.rey.material.widget.CheckBox
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="투모니터"
+                    android:textColor="@color/item_text_basic"
+                    android:textSize="14dp"
+                    app:v_styleId="@array/checkbox" />
+
+                <com.rey.material.widget.CheckBox
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="기계식 키보드"
+                    android:textColor="@color/item_text_basic"
+                    android:textSize="14dp"
+                    app:v_styleId="@array/checkbox" />
+
+                <com.rey.material.widget.CheckBox
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="여성시설"
+                    android:textColor="@color/item_text_basic"
+                    android:textSize="14dp"
+                    app:v_styleId="@array/checkbox" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="#ccc" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingBottom="8dp"
+            android:paddingTop="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="4"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="결제"
+                    android:textColor="@color/item_text_deep"
+                    android:textSize="14dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:orientation="vertical">
+
+                <com.rey.material.widget.CheckBox
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="후불"
+                    android:textColor="@color/item_text_basic"
+                    android:textSize="14dp"
+                    app:v_styleId="@array/checkbox" />
+
+                <com.rey.material.widget.CheckBox
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="카카오페이"
+                    android:textColor="@color/item_text_basic"
+                    android:textSize="14dp"
+                    app:v_styleId="@array/checkbox" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="3"
+                android:orientation="vertical">
+
+                <com.rey.material.widget.CheckBox
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="카드"
+                    android:textColor="@color/item_text_basic"
+                    android:textSize="14dp"
+                    app:v_styleId="@array/checkbox" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="#ccc" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingBottom="8dp"
+            android:paddingTop="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="4"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="게임"
+                    android:textColor="@color/item_text_deep"
+                    android:textSize="14dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:orientation="vertical">
+
+                <com.rey.material.widget.CheckBox
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="리그오브레전드"
+                    android:textColor="@color/item_text_basic"
+                    android:textSize="14dp"
+                    app:v_styleId="@array/checkbox" />
+
+                <com.rey.material.widget.CheckBox
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="스팀"
+                    android:textColor="@color/item_text_basic"
+                    android:textSize="14dp"
+                    app:v_styleId="@array/checkbox" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="3"
+                android:orientation="vertical">
+
+                <com.rey.material.widget.CheckBox
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="서든어택"
+                    android:textColor="@color/item_text_basic"
+                    android:textSize="14dp"
+                    app:v_styleId="@array/checkbox" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="#ccc" />
+    </LinearLayout>
+
+
+</LinearLayout>

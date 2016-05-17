@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#E6432E</color>
+    <color name="colorPrimaryDark">#BA3523</color>
+    <!--<color name="colorAccent">#F2F2F2</color>-->
+    <color name="colorAccent">#FFFF7F00</color>
+    <color name="colorInnerAccent">#E6432E</color>
+
+    <color name="colorDarkAccent">#FF333333</color>
+    <color name="colorSecondAccent">#FFF0724C</color>
+
+    <color name="tab_selected">#FFFFFF</color>
+    <color name="tab_unselected">#5B150B</color>
+
+    <color name="white">#fff</color>
+    <color name="black">#000</color>
+    <color name="eee">#eee</color>
+
+
+
+    <!-- background color-->
+    <color name="lv_background">#f5f5f5f5</color>
+    <color name="lv_divider">#ffffff</color>
+
+    <color name="search_shadow_layout">#80000000</color>
+
+
+    <color name="review_star">#FFFF7F00</color>
+
+    <color name="item_text_deep">#ff333333</color>
+    <color name="item_text_basic">#ff6e6e6e</color>
+    <color name="item_text_light">#ffaaaaaa</color>
+
+    <color name="selector_pressed">#f2f9fd</color>
+    <color name="transparent">#00000000</color>
+
+    <!-- MapView-->
+    <color name="map_slide_btn">#50000000</color>
+    <color name="map_slide_btn_selected">#80000000</color>
+
+
+
+
+    <!--<color name="colorPrimary">#FF03A9F4</color>-->
+    <!--<color name="colorPrimaryDark">#ff0171c9</color>-->
+    <!--<color name="colorAccent">#FF00E5FF</color>-->
+
+    <color name="colorControlNormal">#FF78909C</color>
+    <color name="colorControlActivated">#FF03A9F4</color>
+    <color name="colorSwitchThumbNormal">#FF78909C</color>
+
+    <color name="colorPrimaryQuarter">#3303A9F4</color>
+    <color name="colorPrimaryHalf">#9003A9F4</color>
+    <color name="colorControlNormalHalf">#9078909C</color>
+    <color name="colorControlActivatedHalf">#9003A9F4</color>
+    <color name="colorAccentQuarter">#3300E5FF</color>
+    <color name="colorAccentHalf">#9000E5FF</color>
+
+    <array name="progress_colors_light">
+        <item>#FF03A9F4</item>
+        <item>#FFD8433C</item>
+        <item>#FFF2AF3A</item>
+        <item>#FF279B5E</item>
+    </array>
+
+    <array name="progress_colors_dark">
+        <item>#FF00E5FF</item>
+        <item>#ffd81d5a</item>
+        <item>#fff27512</item>
+        <item>#ff63bc34</item>
+    </array>
+
+    <array name="in_colors_light">
+        <item>#4B03A9F4</item>
+        <item>#3303A9F4</item>
+        <item>#1903A9F4</item>
+    </array>
+
+    <array name="in_colors_dark">
+        <item>#4B00E5FF</item>
+        <item>#3300E5FF</item>
+        <item>#1900E5FF</item>
+    </array>
+
+    <color name="tpi_checked">#FFFFFFFF</color>
+    <color name="tpi_unchecked">#99FFFFFF</color>
+
+    <color name="et_divider_focused">@color/colorControlActivated</color>
+    <color name="et_divider_not_focused">#FF6D6D6D</color>
+    <color name="et_divider_disable">#FFC1C1C1</color>
+
+
+</resources>

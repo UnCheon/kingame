@@ -1,0 +1,214 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#fff"
+    android:orientation="vertical"
+    tools:context="ypunval.com.pcbang.CategoryLocationFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="36dp">
+
+            <TextView
+                android:id="@+id/tv_tab_location"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/border_bottom_primary"
+                android:clickable="true"
+                android:gravity="center"
+                android:padding="0dp"
+                android:text="지역"
+                android:textColor="@color/item_text_deep"
+                android:textSize="14dp" />
+
+            <TextView
+                android:id="@+id/tv_tab_subway"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/selector"
+                android:clickable="true"
+                android:gravity="center"
+                android:text="지하철"
+                android:textColor="@color/item_text_basic"
+                android:textSize="14dp" />
+
+            <!--<TextView-->
+            <!--android:clickable="true"-->
+            <!--android:id="@+id/tv_tab_condition"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_weight="1"-->
+            <!--android:background="@drawable/selector"-->
+            <!--android:gravity="center"-->
+            <!--android:text="조건"-->
+            <!--android:textColor="@color/item_text_basic"-->
+            <!--android:textSize="14dp" />-->
+
+        </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/ll_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <!-- Location LinearLayout-->
+
+            <LinearLayout
+                android:id="@+id/ll_location"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="2">
+
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/rv_doe"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:fillViewport="true"
+                        android:scrollbars="none">
+
+                    </android.support.v7.widget.RecyclerView>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/rv_si"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                    </android.support.v7.widget.RecyclerView>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Subway LinearLayout -->
+
+            <LinearLayout
+                android:id="@+id/ll_subway"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:elevation="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="36dp"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:id="@+id/tv_subway_capital"
+                        android:background="@drawable/selector_grey"
+                        android:textColor="@color/item_text_deep"
+                        android:textSize="14dp"
+                        android:gravity="center"
+                        android:layout_weight="1"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="수도권"/>
+                    <TextView
+                        android:id="@+id/tv_subway_daegue"
+                        android:background="@drawable/selector"
+
+                        android:textColor="@color/item_text_deep"
+                        android:textSize="14dp"
+                        android:gravity="center"
+                        android:layout_weight="1"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="대구"/>
+                    <TextView
+                        android:id="@+id/tv_subway_busan"
+                        android:background="@drawable/selector"
+                        android:textColor="@color/item_text_deep"
+                        android:textSize="14dp"
+                        android:gravity="center"
+                        android:layout_weight="1"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="부산"/>
+                    <TextView
+                        android:id="@+id/tv_subway_gj"
+                        android:background="@drawable/selector"
+
+                        android:textColor="@color/item_text_deep"
+                        android:textSize="14dp"
+                        android:gravity="center"
+                        android:layout_weight="1"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="광주"/>
+                    <TextView
+                        android:id="@+id/tv_subway_dj"
+                        android:background="@drawable/selector"
+
+                        android:textColor="@color/item_text_deep"
+                        android:textSize="14dp"
+                        android:gravity="center"
+                        android:layout_weight="1"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="대전"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="2">
+
+
+
+                       <android.support.v7.widget.RecyclerView
+                           android:id="@+id/rv_line"
+                           android:fillViewport="true"
+                           android:scrollbars="none"
+                           android:layout_width="match_parent"
+                           android:layout_height="match_parent">
+
+                       </android.support.v7.widget.RecyclerView>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+
+                        <android.support.v7.widget.RecyclerView
+                            android:id="@+id/rv_subway"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+
+                        </android.support.v7.widget.RecyclerView>
+
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </FrameLayout>
+    </LinearLayout>
+</LinearLayout>

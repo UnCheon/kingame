@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:clickable="true"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="#ccc" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingLeft="10dp"
+        android:paddingBottom="15dp"
+        android:paddingTop="15dp">
+
+        <com.rey.material.widget.RadioButton
+            android:id="@+id/rb_distance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingRight="100dp"
+            android:checked="true"
+            android:gravity="center_vertical"
+            android:text="가까운 거리순 정렬"
+            app:v_styleId="@array/radio_button" />
+
+        <com.rey.material.widget.RadioButton
+            android:id="@+id/rb_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingRight="100dp"
+            android:checked="false"
+            android:gravity="center_vertical"
+            android:text="낮은 가격순 정렬"
+            app:v_styleId="@array/radio_button" />
+
+        <com.rey.material.widget.RadioButton
+            android:id="@+id/rb_score"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingRight="100dp"
+            android:checked="false"
+            android:gravity="center_vertical"
+            android:text="별점 높은순 정렬"
+            app:v_styleId="@array/radio_button" />
+
+        <com.rey.material.widget.RadioButton
+            android:id="@+id/rb_review"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingRight="100dp"
+            android:checked="false"
+            android:gravity="center_vertical"
+            android:text="후기 많은순 정렬"
+            app:v_styleId="@array/radio_button" />
+
+    </LinearLayout>
+</LinearLayout>

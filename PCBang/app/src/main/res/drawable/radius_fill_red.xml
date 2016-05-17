@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item>
+        <shape android:shape="rectangle">
+            <stroke android:color="@color/review_star" android:width="2px" />
+            <solid android:color="@color/review_star" />
+            <corners android:radius="3dip"/>
+        </shape>
+    </item>
+
+</layer-list>
