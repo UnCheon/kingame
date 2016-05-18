@@ -18,7 +18,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 
-public class PCBasicFragment extends BaseRealmFragment {
+public class PCGalleryFragment extends BaseRealmFragment {
 
     @Bind(R.id.nsv)
     NestedScrollView nsv;
@@ -40,18 +40,18 @@ public class PCBasicFragment extends BaseRealmFragment {
     @Bind(R.id.tv_phone_number)
     TextView tv_phone_number;
 
-    private static final String TAG = PCBasicFragment.class.getName();
-
+    private static final String TAG = PCGalleryFragment.class.getName();
 
     int pcBangId;
     PCBang pcBang;
 
 
-    public PCBasicFragment() {
+    public PCGalleryFragment() {
+
     }
 
-    public static PCBasicFragment newInstance(int pcBangId) {
-        PCBasicFragment fragment = new PCBasicFragment();
+    public static PCGalleryFragment newInstance(int pcBangId) {
+        PCGalleryFragment fragment = new PCGalleryFragment();
         Bundle args = new Bundle();
         args.putInt("pcBangId", pcBangId);
         fragment.setArguments(args);

@@ -92,7 +92,6 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
         ClusterManager.OnClusterItemInfoWindowClickListener<PCBangClusterItem>, GoogleMap.OnMapClickListener,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
-
     @Bind(R.id.drawer_layout)
     DrawerLayout drawer;
 
@@ -112,7 +111,6 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
     LinearLayout ll_conveniences;
     @Bind(R.id.tv_condition)
     TextView tv_condition;
-
 
     private static final String TAG = MainMapActivity.class.getName();
 
@@ -136,7 +134,6 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
     RealmResults<PCBang> pcBangs;
     CustomBottomSheetBehavior customBottomSheetBehavior;
 
-
     //    search view
     int checkedMenuItem = 0;
     private SearchHistoryTable mHistoryDatabase;
@@ -145,10 +142,9 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
     private int mStyle = SearchCodes.STYLE_TOOLBAR_CLASSIC;
     private int mTheme = SearchCodes.THEME_LIGHT;
 
-//    Realm & SharedPreperence
+    //    Realm & SharedPreperence
     Realm realm;
     SharedPreferences mPref;
-
 
 
     @Override
@@ -175,10 +171,12 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
 
     private void setInfoView(){
         customBottomSheetBehavior = (CustomBottomSheetBehavior) BottomSheetBehavior.from(ll_pcBang_info);
+        customBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         infoPagerAdapter = new InfoPagerAdapter(getSupportFragmentManager());
         vpInfo.setAdapter(infoPagerAdapter);
         infoTabLayout.setupWithViewPager(vpInfo);
     }
+
 
     @Override
     public void onBackPressed() {
@@ -431,7 +429,6 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
 
         locationButton.setLayoutParams(newLocationParams);
 
-
         mClusterManager = new ClusterManager<PCBangClusterItem>(this, googleMap);
         pcBangRenderer = new PCBangRenderer(this, googleMap, mClusterManager);
         mClusterManager.setRenderer(pcBangRenderer);
@@ -603,8 +600,7 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
     private void setPCBangData(int pcBangId) {
         final Animation animation = AnimationUtils.loadAnimation(
                 this, R.anim.ani_apear_upside);
-        ll_pcBang_info.startAnimation(animation);
-        ll_pcBang_info.setVisibility(View.VISIBLE);
+        customBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
         ((PCBasicFragment) infoPagerAdapter.getItem(0)).selectedPCBang(pcBangId);
         ((PCPriceFragment) infoPagerAdapter.getItem(1)).selectedPCBang(pcBangId);
@@ -618,29 +614,40 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
         deselectMarker();
     }
 
+    @Override
+    public boolean onClusterClick(Cluster<PCBangClusterItem> cluster) {
+        googleMap.animateCamera(CameraUpdateFactory.zoomIn());
+//        deselectMarker();
+        Log.i("cluster", "click");
+        return false;
+    }
+
+    @Override
+    public void onClusterItemInfoWindowClick(PCBangClusterItem pcBangClusterItem) {
+        Log.i("cluster item infoWindow", "click");
+    }
+
+    @Override
+    public void onClusterInfoWindowClick(Cluster<PCBangClusterItem> cluster) {
+        Log.i("clusterInfowindow", "click");
+    }
+
+
+    @Override
+    public boolean onClusterItemClick(PCBangClusterItem pcBangClusterItem) {
+        Log.i("cluster item", "click");
+
+        deselectMarker();
+        selectMarker(pcBangClusterItem);
+        setPCBangData(pcBangClusterItem.getId());
+        vpInfo.setCurrentItem(0);
+
+        return false;
+    }
 
     private void deselectMarker() {
-        Log.i(TAG, "deselectMarker: ok");
 
-        if (ll_pcBang_info.getVisibility() == View.VISIBLE) {
-            final Animation animation = AnimationUtils.loadAnimation(this, R.anim.ani_disapear_downside);
-            animation.setAnimationListener(new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(Animation animation) {
-
-                }
-
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    ll_pcBang_info.setVisibility(View.GONE);
-                }
-
-                @Override
-                public void onAnimationRepeat(Animation animation) {
-                }
-            });
-            ll_pcBang_info.startAnimation(animation);
-        }
+        customBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
 
         if (mSelectedMarker != null) {
             ImageView imageView = pcBangRenderer.getmImageView();
@@ -670,54 +677,13 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
     }
 
 
-    @Override
-    public void onClusterItemInfoWindowClick(PCBangClusterItem pcBangClusterItem) {
-        Log.i("cluster item infoWindow", "click");
-    }
-
-    @Override
-    public boolean onClusterClick(Cluster<PCBangClusterItem> cluster) {
-        googleMap.animateCamera(CameraUpdateFactory.zoomIn());
-        deselectMarker();
-
-        Log.i("cluster", "click");
-        return false;
-    }
-
-    @Override
-    public void onClusterInfoWindowClick(Cluster<PCBangClusterItem> cluster) {
-        Log.i("clusterInfowindow", "click");
-    }
-
-    @Override
-    public boolean onClusterItemClick(PCBangClusterItem pcBangClusterItem) {
+    private void selectMarker(PCBangClusterItem pcBangClusterItem){
+        customBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
         ImageView imageView = pcBangRenderer.getmImageView();
         TextView textView = pcBangRenderer.getTextView();
         IconGenerator iconGenerator = pcBangRenderer.getmIconGenerator();
         Bitmap icon;
-        switch (selected_alliance_level) {
-            case 0:
-                textView.setBackgroundResource(R.drawable.marker_unselected);
-                break;
-            case 1:
-                textView.setBackgroundResource(R.drawable.marker_unselected);
-                break;
-            case 2:
-                textView.setBackgroundResource(R.drawable.marker_unselected);
-                break;
-        }
-        icon = iconGenerator.makeIcon();
-
-
-        if (mSelectedMarker != null) {
-            try {
-                mSelectedMarker.setIcon(BitmapDescriptorFactory.fromBitmap(icon));
-            } catch (IllegalArgumentException e) {
-                mSelectedMarker = null;
-            }
-        }
-
 
         switch (pcBangClusterItem.getAllianceLevel()) {
             case 0:
@@ -734,29 +700,13 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
 
         mSelectedMarker = pcBangRenderer.getMarker(pcBangClusterItem);
         mSelectedMarker.setIcon(BitmapDescriptorFactory.fromBitmap(icon));
-        setPCBangData(pcBangClusterItem.getId());
-
-        Log.i("cluster item", "click");
-
-
-        LatLng latLng = new LatLng(pcBangClusterItem.getLatLng().latitude, pcBangClusterItem.getLatLng().longitude);
-        CameraPosition cameraPosition = new CameraPosition.Builder().target(latLng).zoom(googleMap.getCameraPosition().zoom).build();
-        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 300, null);
-
-        return false;
     }
+
 
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             Toast.makeText(this, "위치를 가져올수 있는 권한이없습니다.", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -836,13 +786,13 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
-                    return PCPriceFragment.newInstance(pcBangId);
-                case 1:
                     return PCBasicFragment.newInstance(pcBangId);
+                case 1:
+                    return PCPriceFragment.newInstance(pcBangId);
                 case 2:
                     return PCReviewFragment.newInstance(pcBangId);
                 case 3:
-                    return PCPriceFragment.newInstance(pcBangId);
+                    return PCMapFragment.newInstance(pcBangId);
             }
             return null;
         }
@@ -867,8 +817,4 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
             return null;
         }
     }
-
-
-
-
 }

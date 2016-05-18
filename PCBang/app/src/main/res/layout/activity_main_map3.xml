@@ -79,12 +79,12 @@
         <android.support.v4.widget.NestedScrollView
             android:id="@+id/ll_pcBang_info"
             android:layout_width="match_parent"
-            android:layout_height="250dp"
+            android:layout_height="400dp"
             android:background="@android:color/holo_blue_bright"
             android:clipToPadding="true"
             android:orientation="vertical"
-            app:behavior_hideable="false"
-            app:behavior_peekHeight="150dp"
+            app:behavior_hideable="true"
+            app:behavior_peekHeight="220dp"
             app:layout_behavior="com.ypunval.pcbang.util.CustomBottomSheetBehavior">
 
             <LinearLayout
@@ -110,7 +110,7 @@
                 <android.support.v4.view.ViewPager
                     android:id="@+id/vpInfo"
                     android:layout_width="match_parent"
-                    android:layout_height="210dp">
+                    android:layout_height="360dp">
                 </android.support.v4.view.ViewPager>
 
             </LinearLayout>
