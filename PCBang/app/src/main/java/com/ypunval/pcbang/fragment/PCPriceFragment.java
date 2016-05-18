@@ -3,6 +3,7 @@ package com.ypunval.pcbang.fragment;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,17 +12,21 @@ import android.view.ViewGroup;
 import android.widget.TableLayout;
 
 import com.ypunval.pcbang.R;
+import com.ypunval.pcbang.activity.MainMapActivity;
 import com.ypunval.pcbang.model.PCBang;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
 
-public class PCPriceFramgnt extends BaseRealmFragment {
-    private static final String TAG = PCPriceFramgnt.class.getName();
+public class PCPriceFragment extends BaseRealmFragment {
+    private static final String TAG = PCPriceFragment.class.getName();
 
     int pcBangId;
     PCBang pcBang;
+
+    @Bind(R.id.nsv)
+    NestedScrollView nsv;
 
     @Bind(R.id.price_cardview)
     CardView price_cardview;
@@ -29,12 +34,12 @@ public class PCPriceFramgnt extends BaseRealmFragment {
     @Bind(R.id.price_table)
     TableLayout price_table;
 
-    public PCPriceFramgnt(){
+    public PCPriceFragment(){
 
     }
 
-    public static PCPriceFramgnt newInstance(int pcBangId) {
-        PCPriceFramgnt fragment = new PCPriceFramgnt();
+    public static PCPriceFragment newInstance(int pcBangId) {
+        PCPriceFragment fragment = new PCPriceFragment();
         Bundle args = new Bundle();
         args.putInt("pcBangId", pcBangId);
         fragment.setArguments(args);
@@ -67,9 +72,18 @@ public class PCPriceFramgnt extends BaseRealmFragment {
         }
         ButterKnife.bind(this, parent_view);
 
-
-
         makePriceView(inflater, parent_view);
+
+        nsv.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
+            @Override
+            public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                if (scrollY == 0 && scrollY - oldScrollY < 0){
+                    ((MainMapActivity)getContext()).setCanBottomSheetScroll(true);
+                }else{
+                    ((MainMapActivity)getContext()).setCanBottomSheetScroll(false);
+                }
+            }
+        });
 
 
 

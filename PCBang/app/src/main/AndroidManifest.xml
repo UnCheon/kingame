@@ -51,14 +51,12 @@
             android:name=".activity.PCBangInfoActivity"
             android:label="@string/title_activity_pcbang_info"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".activity.SortActivity" />
 
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyBnS-panm7G0HspiQ1jMUVQJJjOqFPoN2Y" />
 
 
-        <activity android:name=".activity.MapActivity"></activity>
         <activity
             android:name=".activity.ResultActivity"
             android:label="@string/title_activity_result"

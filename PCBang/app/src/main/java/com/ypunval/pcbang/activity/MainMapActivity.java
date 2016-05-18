@@ -11,7 +11,7 @@ import android.preference.PreferenceManager;
 import android.speech.RecognizerIntent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
@@ -63,13 +63,14 @@ import com.lapism.searchview.view.SearchCodes;
 import com.lapism.searchview.view.SearchView;
 import com.rey.material.widget.FrameLayout;
 import com.ypunval.pcbang.R;
-import com.ypunval.pcbang.fragment.PCBasicFramgnt;
+import com.ypunval.pcbang.fragment.PCBasicFragment;
 import com.ypunval.pcbang.fragment.PCMapFragment;
-import com.ypunval.pcbang.fragment.PCPriceFramgnt;
+import com.ypunval.pcbang.fragment.PCPriceFragment;
 import com.ypunval.pcbang.fragment.PCReviewFragment;
 import com.ypunval.pcbang.model.Convenience;
 import com.ypunval.pcbang.model.PCBang;
 import com.ypunval.pcbang.util.Constant;
+import com.ypunval.pcbang.util.CustomBottomSheetBehavior;
 import com.ypunval.pcbang.util.CustomSearchView;
 import com.ypunval.pcbang.util.PCBangClusterItem;
 import com.ypunval.pcbang.util.PCBangRenderer;
@@ -133,7 +134,7 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
     float lon = 0;
     private InfoPagerAdapter infoPagerAdapter;
     RealmResults<PCBang> pcBangs;
-
+    CustomBottomSheetBehavior customBottomSheetBehavior;
 
 
     //    search view
@@ -159,14 +160,21 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
         mapFragment.getMapAsync(this);
 
         ButterKnife.bind(this);
+
+
         setSearchView();
         setInfoView();
         googleApiClient = getLocationApiClient();
 
-
     }
 
+    public void setCanBottomSheetScroll(boolean can){
+        customBottomSheetBehavior.setCanScroll(can);
+    }
+
+
     private void setInfoView(){
+        customBottomSheetBehavior = (CustomBottomSheetBehavior) BottomSheetBehavior.from(ll_pcBang_info);
         infoPagerAdapter = new InfoPagerAdapter(getSupportFragmentManager());
         vpInfo.setAdapter(infoPagerAdapter);
         infoTabLayout.setupWithViewPager(vpInfo);
@@ -598,8 +606,8 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
         ll_pcBang_info.startAnimation(animation);
         ll_pcBang_info.setVisibility(View.VISIBLE);
 
-        ((PCBasicFramgnt) infoPagerAdapter.getItem(0)).selectedPCBang(pcBangId);
-        ((PCPriceFramgnt) infoPagerAdapter.getItem(1)).selectedPCBang(pcBangId);
+        ((PCBasicFragment) infoPagerAdapter.getItem(0)).selectedPCBang(pcBangId);
+        ((PCPriceFragment) infoPagerAdapter.getItem(1)).selectedPCBang(pcBangId);
         ((PCReviewFragment) infoPagerAdapter.getItem(2)).selectedPCBang(pcBangId);
         ((PCMapFragment) infoPagerAdapter.getItem(3)).selectedPCBang(pcBangId);
     }
@@ -828,13 +836,13 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
-                    return PCBasicFramgnt.newInstance(pcBangId);
+                    return PCPriceFragment.newInstance(pcBangId);
                 case 1:
-                    return PCPriceFramgnt.newInstance(pcBangId);
+                    return PCBasicFragment.newInstance(pcBangId);
                 case 2:
                     return PCReviewFragment.newInstance(pcBangId);
                 case 3:
-                    return PCMapFragment.newInstance(pcBangId);
+                    return PCPriceFragment.newInstance(pcBangId);
             }
             return null;
         }
@@ -859,6 +867,8 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
             return null;
         }
     }
+
+
 
 
 }

@@ -4,8 +4,6 @@ import android.app.Application;
 import android.content.res.AssetManager;
 import android.util.Log;
 
-import com.facebook.stetho.Stetho;
-import com.uphyca.stetho_realm.RealmInspectorModulesProvider;
 import com.ypunval.pcbang.util.PCBangRealmModule;
 
 import java.io.File;
@@ -33,11 +31,11 @@ public class MyApplication extends Application {
 
         Realm.setDefaultConfiguration(pcBangConfig);
 
-        Stetho.initialize(
-                Stetho.newInitializerBuilder(this)
-                        .enableDumpapp(Stetho.defaultDumperPluginsProvider(this))
-                        .enableWebKitInspector(RealmInspectorModulesProvider.builder(this).build())
-                        .build());
+//        Stetho.initialize(
+//                Stetho.newInitializerBuilder(this)
+//                        .enableDumpapp(Stetho.defaultDumperPluginsProvider(this))
+//                        .enableWebKitInspector(RealmInspectorModulesProvider.builder(this).build())
+//                        .build());
         fileCopy();
 
     }

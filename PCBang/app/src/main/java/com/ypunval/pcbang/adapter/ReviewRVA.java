@@ -36,7 +36,7 @@ public class ReviewRVA extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     @Override
     public int getItemCount() {
-        return mValues.size() + 1;
+        return mValues.size() + 10;
     }
 
     @Override
@@ -86,11 +86,18 @@ public class ReviewRVA extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         } else if (holder instanceof ItemViewHolder) {
 
             final ItemViewHolder item_holder = (ItemViewHolder) holder;
-            item_holder.mItem = mValues.get(position-1);
-            item_holder.tv_rate.setText(String.valueOf(item_holder.mItem.getRate()));
-            item_holder.tv_nickname.setText(item_holder.mItem.getNickname());
-            item_holder.tv_created.setText(item_holder.mItem.getCreated());
-            item_holder.tv_content.setText(item_holder.mItem.getContent());
+//            item_holder.mItem = mValues.get(position-1);
+//            item_holder.tv_rate.setText(String.valueOf(item_holder.mItem.getRate()));
+//            item_holder.tv_nickname.setText(item_holder.mItem.getNickname());
+//            item_holder.tv_created.setText(item_holder.mItem.getCreated());
+//            item_holder.tv_content.setText(item_holder.mItem.getContent());
+
+//            item_holder.mItem = mValues.get(position-1);
+            item_holder.tv_rate.setText("0");
+            item_holder.tv_nickname.setText("zz");
+            item_holder.tv_created.setText("20123");
+            item_holder.tv_content.setText("asdfafdadsf");
+
 
             item_holder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override

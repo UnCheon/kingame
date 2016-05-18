@@ -17,9 +17,9 @@ import com.daimajia.slider.library.Indicators.PagerIndicator;
 import com.daimajia.slider.library.SliderLayout;
 import com.daimajia.slider.library.SliderTypes.BaseSliderView;
 import com.ypunval.pcbang.R;
-import com.ypunval.pcbang.fragment.PCBasicFramgnt;
+import com.ypunval.pcbang.fragment.PCBasicFragment;
 import com.ypunval.pcbang.fragment.PCMapFragment;
-import com.ypunval.pcbang.fragment.PCPriceFramgnt;
+import com.ypunval.pcbang.fragment.PCPriceFragment;
 import com.ypunval.pcbang.fragment.PCReviewFragment;
 import com.ypunval.pcbang.model.PCBang;
 import com.ypunval.pcbang.util.SliderPCBangInfoView;
@@ -163,9 +163,9 @@ public class PCBangInfoActivity extends BaseRealmActivity {
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
-                    return PCBasicFramgnt.newInstance(pcBangId);
+                    return PCBasicFragment.newInstance(pcBangId);
                 case 1:
-                    return PCPriceFramgnt.newInstance(pcBangId);
+                    return PCPriceFragment.newInstance(pcBangId);
                 case 2:
                     return PCReviewFragment.newInstance(pcBangId);
                 case 3:

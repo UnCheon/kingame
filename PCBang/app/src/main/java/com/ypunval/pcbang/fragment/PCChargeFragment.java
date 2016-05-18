@@ -11,16 +11,16 @@ import com.ypunval.pcbang.R;
 import com.ypunval.pcbang.model.PCBang;
 
 
-public class PCChargeFramgnt extends BaseRealmFragment {
+public class PCChargeFragment extends BaseRealmFragment {
 
     int pcBangId;
     PCBang pcBang;
-    public PCChargeFramgnt(){
+    public PCChargeFragment(){
 
     }
 
-    public static PCChargeFramgnt newInstance(int pcBangId) {
-        PCChargeFramgnt fragment = new PCChargeFramgnt();
+    public static PCChargeFragment newInstance(int pcBangId) {
+        PCChargeFragment fragment = new PCChargeFragment();
         Bundle args = new Bundle();
         args.putInt("pcBangId", pcBangId);
         fragment.setArguments(args);

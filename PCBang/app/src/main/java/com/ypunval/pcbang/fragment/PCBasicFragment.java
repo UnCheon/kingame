@@ -3,6 +3,7 @@ package com.ypunval.pcbang.fragment;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.widget.NestedScrollView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,13 +11,18 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.ypunval.pcbang.R;
+import com.ypunval.pcbang.activity.MainMapActivity;
 import com.ypunval.pcbang.model.PCBang;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
 
-public class PCBasicFramgnt extends BaseRealmFragment {
+public class PCBasicFragment extends BaseRealmFragment {
+
+    @Bind(R.id.nsv)
+    NestedScrollView nsv;
+
     @Bind(R.id.tv_average_rate)
     TextView tv_average_rate;
     @Bind(R.id.tv_review_count)
@@ -34,18 +40,18 @@ public class PCBasicFramgnt extends BaseRealmFragment {
     @Bind(R.id.tv_phone_number)
     TextView tv_phone_number;
 
-    private static final String TAG = PCBasicFramgnt.class.getName();
+    private static final String TAG = PCBasicFragment.class.getName();
 
 
     int pcBangId;
     PCBang pcBang;
 
 
-    public PCBasicFramgnt() {
+    public PCBasicFragment() {
     }
 
-    public static PCBasicFramgnt newInstance(int pcBangId) {
-        PCBasicFramgnt fragment = new PCBasicFramgnt();
+    public static PCBasicFragment newInstance(int pcBangId) {
+        PCBasicFragment fragment = new PCBasicFragment();
         Bundle args = new Bundle();
         args.putInt("pcBangId", pcBangId);
         fragment.setArguments(args);
@@ -77,6 +83,19 @@ public class PCBasicFramgnt extends BaseRealmFragment {
             view = inflater.inflate(R.layout.fragment_pc_basic_pre_5, container, false);
         }
         ButterKnife.bind(this, view);
+
+        nsv.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
+            @Override
+            public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                    Log.i(TAG, "onScrollChange: " + scrollY + "  " + oldScrollY);
+                if (scrollY == 0 && scrollY - oldScrollY < 0){
+                    ((MainMapActivity)getContext()).setCanBottomSheetScroll(true);
+                }else{
+                    ((MainMapActivity)getContext()).setCanBottomSheetScroll(false);
+                }
+
+            }
+        });
 
         return view;
     }

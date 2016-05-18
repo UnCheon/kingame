@@ -428,8 +428,8 @@ public class MainMapFragment extends BaseFragment implements ClusterManager.OnCl
         ll_pcBang_info.startAnimation(animation);
         ll_pcBang_info.setVisibility(View.VISIBLE);
 
-        ((PCBasicFramgnt) infoPagerAdapter.getItem(0)).selectedPCBang(pcBangId);
-        ((PCPriceFramgnt) infoPagerAdapter.getItem(1)).selectedPCBang(pcBangId);
+        ((PCBasicFragment) infoPagerAdapter.getItem(0)).selectedPCBang(pcBangId);
+        ((PCPriceFragment) infoPagerAdapter.getItem(1)).selectedPCBang(pcBangId);
         ((PCReviewFragment) infoPagerAdapter.getItem(2)).selectedPCBang(pcBangId);
         ((PCMapFragment) infoPagerAdapter.getItem(3)).selectedPCBang(pcBangId);
     }
@@ -671,9 +671,9 @@ public class MainMapFragment extends BaseFragment implements ClusterManager.OnCl
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
-                    return PCBasicFramgnt.newInstance(pcBangId);
+                    return PCBasicFragment.newInstance(pcBangId);
                 case 1:
-                    return PCPriceFramgnt.newInstance(pcBangId);
+                    return PCPriceFragment.newInstance(pcBangId);
                 case 2:
                     return PCReviewFragment.newInstance(pcBangId);
                 case 3:

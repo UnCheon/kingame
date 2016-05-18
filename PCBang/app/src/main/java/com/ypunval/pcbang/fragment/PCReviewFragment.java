@@ -1,14 +1,18 @@
 package com.ypunval.pcbang.fragment;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.ypunval.pcbang.R;
+import com.ypunval.pcbang.activity.MainMapActivity;
 import com.ypunval.pcbang.activity.ReviewActivity;
 import com.ypunval.pcbang.adapter.ReviewRVA;
 import com.ypunval.pcbang.listener.PCBangListenerInterface;
@@ -31,6 +35,8 @@ public class PCReviewFragment extends BaseRealmFragment {
 
     int pcBangId;
     ReviewRVA adapter;
+
+    int scrollY = 0;
 
     private PCBangListenerInterface.OnReviewClickListener listener;
 
@@ -98,6 +104,40 @@ public class PCReviewFragment extends BaseRealmFragment {
 
         rv_review.setLayoutManager(new LinearLayoutManager(getContext()));
         rv_review.setAdapter(adapter);
+        
+        rv_review.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState){
+                Log.i(TAG, "onScrollStateChanged: " + scrollY);
+                if (scrollY == 0){
+                    ((MainMapActivity)getContext()).setCanBottomSheetScroll(true);
+                }else{
+                    ((MainMapActivity)getContext()).setCanBottomSheetScroll(false);
+                }
+            }
+            
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy){
+                scrollY += dy;
+            }
+            
+            
+        });
+
+
+
+
+
+
+
+
+//        rv_review.setOnScrollChangeListener(new RecyclerView.OnScrollChangeListener() {
+//            @Override
+//            public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+//                Log.i(TAG, "onScrollChange: " + scrollY + "  " + oldScrollY);
+//                ((MainMapActivity)getContext()).setScrollY(scrollY, oldScrollY);
+//            }
+//        });
         return view;
     }
 
