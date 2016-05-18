@@ -1,7 +1,9 @@
 package com.ypunval.pcbang;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.res.AssetManager;
+import android.support.multidex.MultiDex;
 import android.util.Log;
 
 import com.ypunval.pcbang.util.PCBangRealmModule;
@@ -38,6 +40,11 @@ public class MyApplication extends Application {
 //                        .build());
         fileCopy();
 
+    }
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        MultiDex.install(this);
     }
 
 
