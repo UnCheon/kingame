@@ -80,7 +80,7 @@
             android:id="@+id/ll_pcBang_info"
             android:layout_width="match_parent"
             android:layout_height="400dp"
-            android:background="@android:color/holo_blue_bright"
+            android:background="#f5f5f5"
             android:clipToPadding="true"
             android:orientation="vertical"
             app:behavior_hideable="true"
@@ -121,7 +121,6 @@
 
 
     <com.ypunval.pcbang.util.CustomSearchView
-        android:visibility="gone"
         android:id="@+id/searchView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

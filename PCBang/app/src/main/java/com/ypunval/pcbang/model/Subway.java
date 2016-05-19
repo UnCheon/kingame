@@ -10,9 +10,8 @@ public class Subway extends RealmObject {
     private String line;
     private String region;
     private int pcBangCount;
-    private float lattitude;
+    private float latitude;
     private float longitude;
-
 
     public int getId() {
         return id;
@@ -54,12 +53,12 @@ public class Subway extends RealmObject {
         this.pcBangCount = pcBangCount;
     }
 
-    public float getLattitude() {
-        return lattitude;
+    public float getLatitude() {
+        return latitude;
     }
 
-    public void setLattitude(float lattitude) {
-        this.lattitude = lattitude;
+    public void setLatitude(float latitude) {
+        this.latitude = latitude;
     }
 
     public float getLongitude() {

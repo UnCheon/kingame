@@ -1,0 +1,34 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_marker"
+    android:layout_width="70dp"
+    android:layout_height="47dp"
+    android:background="@drawable/bubble_grey"
+    android:orientation="vertical"
+    android:paddingBottom="13dp"
+    android:paddingLeft="2dp"
+    android:paddingRight="4dp"
+    android:paddingTop="3dp">
+
+    <TextView
+        android:id="@+id/tv_name"
+        android:layout_width="64dp"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:maxLines="1"
+        android:text="샹떼pc방 삼성중앙점"
+        android:textColor="@color/colorDarkAccent"
+        android:textSize="10dp" />
+
+    <TextView
+        android:id="@+id/tv_price"
+        android:layout_width="64dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="1,200"
+        android:textColor="@color/colorDarkAccent"
+        android:textSize="11dp"
+        android:textStyle="bold" />
+</LinearLayout>
+
+

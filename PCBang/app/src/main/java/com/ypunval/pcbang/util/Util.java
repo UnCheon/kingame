@@ -4,9 +4,14 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.ypunval.pcbang.R;
 
 /**
  * Created by uncheon on 2016. 3. 4..
@@ -60,6 +65,54 @@ public class Util {
 //        dist = dist * 1000.0;      // 단위  km 에서 m 로 변환
 
         return (float)dist;
+    }
+
+
+    public static void setMarkerLinearLayout(Context context, LinearLayout linearLayout, int level){
+        int marker_width = (int) context.getResources().getDimension(R.dimen.marker_width);
+        int marker_height = (int) context.getResources().getDimension(R.dimen.marker_height);
+
+        int marker_padding_left = (int) context.getResources().getDimension(R.dimen.marker_padding_left);
+        int marker_padding_top = (int) context.getResources().getDimension(R.dimen.marker_padding_top);
+        int marker_padding_right = (int) context.getResources().getDimension(R.dimen.marker_padding_right);
+        int marker_padding_bottom = (int) context.getResources().getDimension(R.dimen.marker_padding_bottom);
+
+
+        int marker_small_width = (int) context.getResources().getDimension(R.dimen.marker_small_width);
+        int marker_small_height = (int) context.getResources().getDimension(R.dimen.marker_small_height);
+
+        int marker_small_padding_left = (int) context.getResources().getDimension(R.dimen.marker_small_padding_left);
+        int marker_small_padding_top = (int) context.getResources().getDimension(R.dimen.marker_small_padding_top);
+        int marker_small_padding_right = (int) context.getResources().getDimension(R.dimen.marker_small_padding_right);
+        int marker_small_padding_bottom = (int) context.getResources().getDimension(R.dimen.marker_small_padding_bottom);
+
+        int width = 0;
+        int height = 0;
+        int paddingLeft = 0;
+        int paddingTop = 0;
+        int paddingRight = 0;
+        int paddingBottom = 0;
+
+        if (level == 0){
+            width = marker_small_width;
+            height = marker_small_height;
+            paddingLeft = marker_small_padding_left;
+            paddingTop = marker_small_padding_top;
+            paddingRight = marker_small_padding_right;
+            paddingBottom = marker_small_padding_bottom;
+        }else{
+            width = marker_width;
+            height = marker_height;
+            paddingLeft = marker_padding_left;
+            paddingTop = marker_padding_top;
+            paddingRight = marker_padding_right;
+            paddingBottom = marker_padding_bottom;
+        }
+
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(width, height);
+        linearLayout.setLayoutParams(params);
+        linearLayout.setGravity(Gravity.CENTER_HORIZONTAL);
+        linearLayout.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
     }
 
 

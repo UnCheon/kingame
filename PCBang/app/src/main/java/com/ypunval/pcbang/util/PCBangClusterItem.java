@@ -17,13 +17,8 @@ public class PCBangClusterItem implements ClusterItem {
 
     LatLng latLng;
 
-    public PCBangClusterItem(PCBang pcBang){
-        id = pcBang.getId();
-        pcBangName = pcBang.getName();
-        minPrice = pcBang.getMinPrice();
-        allianceLevel = pcBang.getAllianceLevel();
-        latLng = new LatLng(pcBang.getLatitude(), pcBang.getLongitude());
-        pcBang.setSelected(false);
+    public PCBangClusterItem(){
+
     }
 
     @Override
@@ -31,23 +26,45 @@ public class PCBangClusterItem implements ClusterItem {
         return latLng;
     }
 
+    public LatLng getLatLng() {
+        return latLng;
+    }
+
+    public void setLatLng(LatLng latLng) {
+        this.latLng = latLng;
+    }
+
     public int getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getPcBangName() {
         return pcBangName;
     }
 
+    public void setPcBangName(String pcBangName) {
+        this.pcBangName = pcBangName;
+    }
+
     public int getMinPrice() {
         return minPrice;
+    }
+
+    public void setMinPrice(int minPrice) {
+        this.minPrice = minPrice;
     }
 
     public int getAllianceLevel() {
         return allianceLevel;
     }
 
-    public LatLng getLatLng() {
-        return latLng;
+    public void setAllianceLevel(int allianceLevel) {
+        this.allianceLevel = allianceLevel;
     }
+
+
 }

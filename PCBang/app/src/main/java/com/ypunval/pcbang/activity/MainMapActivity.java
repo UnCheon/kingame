@@ -1,10 +1,13 @@
 package com.ypunval.pcbang.activity;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -27,6 +30,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -68,7 +72,10 @@ import com.ypunval.pcbang.fragment.PCMapFragment;
 import com.ypunval.pcbang.fragment.PCPriceFragment;
 import com.ypunval.pcbang.fragment.PCReviewFragment;
 import com.ypunval.pcbang.model.Convenience;
+import com.ypunval.pcbang.model.Dong;
 import com.ypunval.pcbang.model.PCBang;
+import com.ypunval.pcbang.model.Si;
+import com.ypunval.pcbang.model.Subway;
 import com.ypunval.pcbang.util.Constant;
 import com.ypunval.pcbang.util.CustomBottomSheetBehavior;
 import com.ypunval.pcbang.util.CustomSearchView;
@@ -80,6 +87,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Random;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -117,13 +125,13 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
     //    Google Map
     MapFragment mapFragment;
     private GoogleMap googleMap;
-    private static final int ZOOM = 14;
+    private static final int ZOOM = 16;
     GoogleApiClient googleApiClient;
     LocationRequest locationRequest = createLocationRequest();
     int pcBangId = 1;
     int resultCount = 0;
     boolean isFirst = true;
-    int range = 10;
+    int range = 3;
     private ClusterManager<PCBangClusterItem> mClusterManager;
     private PCBangRenderer pcBangRenderer;
     Marker mSelectedMarker = null;
@@ -131,7 +139,6 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
     float lat = 0;
     float lon = 0;
     private InfoPagerAdapter infoPagerAdapter;
-    RealmResults<PCBang> pcBangs;
     CustomBottomSheetBehavior customBottomSheetBehavior;
 
     //    search view
@@ -164,12 +171,12 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
 
     }
 
-    public void setCanBottomSheetScroll(boolean can){
+    public void setCanBottomSheetScroll(boolean can) {
         customBottomSheetBehavior.setCanScroll(can);
     }
 
 
-    private void setInfoView(){
+    private void setInfoView() {
         customBottomSheetBehavior = (CustomBottomSheetBehavior) BottomSheetBehavior.from(ll_pcBang_info);
         customBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         infoPagerAdapter = new InfoPagerAdapter(getSupportFragmentManager());
@@ -253,7 +260,7 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
             @Override
             public boolean onQueryTextSubmit(String query) {
                 mHistoryDatabase.addItem(new SearchItem(query));
-                Toast.makeText(getApplicationContext(), query, Toast.LENGTH_SHORT).show();
+                searchPlace(query);
                 return false;
             }
 
@@ -280,7 +287,7 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
                 TextView textView = (TextView) view.findViewById(R.id.textView_item_text);
                 CharSequence text = textView.getText();
                 mHistoryDatabase.addItem(new SearchItem(text));
-                Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT).show();
+                searchPlace(text.toString());
             }
         });
 
@@ -290,6 +297,100 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
         FrameLayout.LayoutParams cvParams = (FrameLayout.LayoutParams) cardView.getLayoutParams();
         cvParams.topMargin += getStatusBarHeight();
         cardView.setLayoutParams(cvParams);
+    }
+
+    private void searchPlace(String query) {
+        float lat_search = 0;
+        float lon_search = 0;
+        Dong dong = null;
+        Subway subway = null;
+        Si si = null;
+        int count = 0;
+        while (count < 5) {
+            switch (count) {
+                case 0:
+                    dong = realm.where(Dong.class).equalTo("name", query).findFirst();
+                    break;
+                case 1:
+                    dong = realm.where(Dong.class).equalTo("name", query + "동").findFirst();
+                    break;
+                case 2:
+                    dong = realm.where(Dong.class).equalTo("name", query + "읍").findFirst();
+                    break;
+                case 3:
+                    dong = realm.where(Dong.class).equalTo("name", query + "면").findFirst();
+                    break;
+                case 4:
+                    dong = realm.where(Dong.class).equalTo("name", query + "리").findFirst();
+            }
+
+            if (dong != null) {
+                lat_search = dong.getLatitude();
+                lon_search = dong.getLongitude();
+                break;
+            }
+
+            count++;
+
+        }
+
+        if (dong == null) {
+            count = 0;
+            while (count < 2) {
+                switch (count) {
+                    case 0:
+                        subway = realm.where(Subway.class).equalTo("name", query).findFirst();
+                        break;
+                    case 1:
+                        subway = realm.where(Subway.class).equalTo("name", query + "역").findFirst();
+                        break;
+
+                }
+
+                if (subway != null) {
+                    lat_search = subway.getLatitude();
+                    lon_search = subway.getLongitude();
+                    break;
+                }
+
+                count++;
+            }
+        }
+
+
+        if (dong == null && subway == null) {
+            count = 0;
+            while (count < 3) {
+                switch (count) {
+                    case 0:
+                        si = realm.where(Si.class).equalTo("name", query).findFirst();
+                        break;
+                    case 1:
+                        si = realm.where(Si.class).equalTo("name", query + "구").findFirst();
+                        break;
+                    case 2:
+                        si = realm.where(Si.class).equalTo("name", query + "시").findFirst();
+                        break;
+                }
+
+                if (si != null) {
+                    lat_search = si.getLatitude();
+                    lon_search = si.getLongitude();
+                    break;
+                }
+
+                count++;
+            }
+        }
+
+        if (lat_search == 0 || lon_search == 0) {
+            Toast.makeText(getApplicationContext(), "\"" + query + "\"" + " 로 검색된 결과가 없습니다.", Toast.LENGTH_SHORT).show();
+
+        } else {
+            CameraPosition cameraPosition = new CameraPosition.Builder().target(new LatLng(lat_search, lon_search)).zoom(ZOOM).build();
+            googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 300, null);
+            searchView.hide(true);
+        }
     }
 
     @Override
@@ -372,7 +473,6 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
         if (resourceId > 0) {
             result = getResources().getDimensionPixelSize(resourceId);
         }
-        Log.i(TAG, "getStatusBarHeight: " + result);
         return result;
     }
 
@@ -420,7 +520,7 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
         RelativeLayout.LayoutParams locationParams = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
         RelativeLayout.LayoutParams newLocationParams = new RelativeLayout.LayoutParams(locationParams.width, locationParams.height);
         newLocationParams.rightMargin = locationParams.rightMargin;
-        newLocationParams.topMargin = (int)getResources().getDimension(R.dimen.my_location_top_margin);
+        newLocationParams.topMargin = (int) getResources().getDimension(R.dimen.my_location_top_margin);
         newLocationParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
         newLocationParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
 
@@ -447,19 +547,19 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
                 if (Math.abs(cameraPosition.zoom - pastZoom) >= 1) {
                     pastZoom = cameraPosition.zoom;
                 } else {
-                    if (cameraPosition.zoom > 12) {
-                        float dist = Util.calDistance(pastLatlng.latitude, pastLatlng.longitude, cameraPosition.target.latitude, cameraPosition.target.longitude);
-                        Log.i(TAG, "onCameraChange: dist : " + dist);
-                        if (dist > 5) {
+//                    if (cameraPosition.zoom > 12) {
+                    float dist = Util.calDistance(pastLatlng.latitude, pastLatlng.longitude, cameraPosition.target.latitude, cameraPosition.target.longitude);
+                    Log.i(TAG, "onCameraChange: dist : " + dist);
+                    if (dist > 3) {
 
-                            lat = (float) cameraPosition.target.latitude;
-                            lon = (float) cameraPosition.target.longitude;
-                            Log.i(TAG, "onCameraChange: start get data");
-                            getData();
-                            pastLatlng = cameraPosition.target;
+                        lat = (float) cameraPosition.target.latitude;
+                        lon = (float) cameraPosition.target.longitude;
+                        Log.i(TAG, "onCameraChange: start get data");
+                        getData();
+                        pastLatlng = cameraPosition.target;
 
-                        }
-                    } else {
+//                        }
+//                    } else {
 
                     }
                 }
@@ -479,7 +579,7 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
         mClusterManager.setOnClusterItemClickListener(this);
         mClusterManager.setOnClusterItemInfoWindowClickListener(this);
 
-        mClusterManager.cluster();
+//        mClusterManager.cluster();
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -496,40 +596,43 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
 
     private void getData() {
         if (lat != 0 && lon != 0) {
-            realm.executeTransaction(new Realm.Transaction() {
-                @Override
-                public void execute(Realm realm) {
-                    Log.i(TAG, "execute: " + System.currentTimeMillis());
-                    RealmQuery<PCBang> query = realm.where(PCBang.class).equalTo("exist", true);
-                    float lat_small = lat - Constant.LATITUDE_CONSTANT * range;
-                    float lat_big = lat + Constant.LATITUDE_CONSTANT * range;
 
-                    float lon_small = lon - Constant.LONGITUDE_CONSTANT * range;
-                    float lon_big = lon + Constant.LONGITUDE_CONSTANT * range;
-                    pcBangs = query.between("latitude", lat_small, lat_big)
-                            .between("longitude", lon_small, lon_big).findAll();
+            realm.beginTransaction();
+            mClusterManager.clearItems();
 
-                    resultCount = pcBangs.size();
+            RealmQuery<PCBang> query = realm.where(PCBang.class).equalTo("exist", true);
+            float lat_small = lat - Constant.LATITUDE_CONSTANT * range;
+            float lat_big = lat + Constant.LATITUDE_CONSTANT * range;
 
-                    mClusterManager.clearItems();
-                    if (pcBangs != null) {
-                        for (PCBang pcBang : pcBangs) {
-                            PCBangClusterItem item = new PCBangClusterItem(pcBang);
-                            mClusterManager.addItem(item);
-                        }
-                    }
+            float lon_small = lon - Constant.LONGITUDE_CONSTANT * range;
+            float lon_big = lon + Constant.LONGITUDE_CONSTANT * range;
 
+            query.between("latitude", lat_small, lat_big).between("longitude", lon_small, lon_big);
+
+            for (Convenience convenience : Constant.conveniences) {
+                if (convenience.isSelected())
+                    query.equalTo("convenience.id", convenience.getId());
+            }
+
+            RealmResults<PCBang> pcBangs = query.findAll();
+
+            Log.i(TAG, "execute: pcbang count = " + pcBangs.size());
+
+            if (pcBangs != null) {
+                for (PCBang pcBang : pcBangs) {
+                    PCBangClusterItem item = new PCBangClusterItem();
+                    item.setLatLng(new LatLng(pcBang.getLatitude(), pcBang.getLongitude()));
+                    item.setId(pcBang.getId());
+                    item.setPcBangName(pcBang.getName());
+                    item.setAllianceLevel(pcBang.getAllianceLevel());
+                    item.setMinPrice(pcBang.getMinPrice());
+                    mClusterManager.addItem(item);
                 }
-            }, new Realm.Transaction.Callback() {
-                @Override
-                public void onSuccess() {
-                    Log.i(TAG, "execute: " + System.currentTimeMillis());
-                    mClusterManager.cluster();
+            }
 
-                }
-            });
+            realm.commitTransaction();
+            mClusterManager.cluster();
         }
-
 
         if (lat != 0 && lon != 0) {
 
@@ -586,6 +689,12 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
                         convenience.setSelected(true);
 
                     setCategory();
+
+                    lat = (float) googleMap.getCameraPosition().target.latitude;
+                    lon = (float) googleMap.getCameraPosition().target.longitude;
+
+                    getData();
+
                 }
             });
         }
@@ -598,14 +707,12 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
 
 
     private void setPCBangData(int pcBangId) {
-        final Animation animation = AnimationUtils.loadAnimation(
-                this, R.anim.ani_apear_upside);
         customBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
         ((PCBasicFragment) infoPagerAdapter.getItem(0)).selectedPCBang(pcBangId);
         ((PCPriceFragment) infoPagerAdapter.getItem(1)).selectedPCBang(pcBangId);
         ((PCReviewFragment) infoPagerAdapter.getItem(2)).selectedPCBang(pcBangId);
-        ((PCMapFragment) infoPagerAdapter.getItem(3)).selectedPCBang(pcBangId);
+        ((PCBasicFragment) infoPagerAdapter.getItem(3)).selectedPCBang(pcBangId);
     }
 
 
@@ -650,58 +757,98 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
         customBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
 
         if (mSelectedMarker != null) {
-            ImageView imageView = pcBangRenderer.getmImageView();
-            TextView textView = pcBangRenderer.getTextView();
-            IconGenerator iconGenerator = pcBangRenderer.getmIconGenerator();
+            LinearLayout linearLayout = pcBangRenderer.getLinearLayout();
+            TextView tv_name = (TextView) linearLayout.findViewById(R.id.tv_name);
+            TextView tv_price = (TextView) linearLayout.findViewById(R.id.tv_price);
+
+            IconGenerator mIconGenerator = pcBangRenderer.getmIconGenerator();
             Bitmap icon;
+
+            Util.setMarkerLinearLayout(this, linearLayout, selected_alliance_level);
 
             switch (selected_alliance_level) {
                 case 0:
-//                    imageView.setImageResource(R.drawable.marker_red_unselected);
-                    textView.setBackgroundResource(R.drawable.marker_unselected);
+                    tv_price.setVisibility(View.GONE);
+                    linearLayout.setBackgroundResource(R.drawable.bubble_grey_small);
+                    tv_price.setTextColor(ContextCompat.getColor(this, R.color.colorDarkAccent));
+                    tv_name.setTextColor(ContextCompat.getColor(this, R.color.colorDarkAccent));
                     break;
                 case 1:
-//                    imageView.setImageResource(R.drawable.marker_red_unselected);
-                    textView.setBackgroundResource(R.drawable.marker_unselected);
+                    tv_price.setVisibility(View.VISIBLE);
+                    linearLayout.setBackgroundResource(R.drawable.bubble_grey);
+                    tv_price.setTextColor(ContextCompat.getColor(this, R.color.colorDarkAccent));
+                    tv_name.setTextColor(ContextCompat.getColor(this, R.color.colorDarkAccent));
+
                     break;
                 case 2:
-//                    imageView.setImageResource(R.drawable.marker_red_unselected);
-                    textView.setBackgroundResource(R.drawable.marker_unselected);
+                    linearLayout.setBackgroundResource(R.drawable.bubble_primary);
+                    tv_price.setTextColor(ContextCompat.getColor(this, R.color.white));
+                    tv_name.setTextColor(ContextCompat.getColor(this, R.color.white));
+                    tv_price.setVisibility(View.VISIBLE);
+
                     break;
             }
-//            iconGenerator.setContentView(imageView);
-            icon = iconGenerator.makeIcon();
+            icon = mIconGenerator.makeIcon();
+
+            
             mSelectedMarker.setIcon(BitmapDescriptorFactory.fromBitmap(icon));
             mSelectedMarker = null;
         }
     }
 
 
-    private void selectMarker(PCBangClusterItem pcBangClusterItem){
+    private void selectMarker(PCBangClusterItem pcBangClusterItem) {
         customBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
-        ImageView imageView = pcBangRenderer.getmImageView();
-        TextView textView = pcBangRenderer.getTextView();
-        IconGenerator iconGenerator = pcBangRenderer.getmIconGenerator();
+        IconGenerator mIconGenerator = pcBangRenderer.getmIconGenerator();
+        LinearLayout linearLayout = pcBangRenderer.getLinearLayout();
+
+
+        TextView tv_name = (TextView) linearLayout.findViewById(R.id.tv_name);
+        TextView tv_price = (TextView) linearLayout.findViewById(R.id.tv_price);
+
+        tv_name.setText(pcBangClusterItem.getPcBangName());
+        tv_price.setText("1,200");
+
         Bitmap icon;
 
-        switch (pcBangClusterItem.getAllianceLevel()) {
+        int level = pcBangClusterItem.getAllianceLevel();
+
+        // TODO: 2016. 5. 19. level 을 pcBangClusterItem에서 가져온것을 넣어준다.  
+        Random random = new Random();
+        int _level = random.nextInt(3);
+
+        selected_alliance_level = _level;
+        Util.setMarkerLinearLayout(this, linearLayout, selected_alliance_level);
+
+        switch (selected_alliance_level) {
             case 0:
-                textView.setBackgroundResource(R.drawable.marker_selected);
+                linearLayout.setBackgroundResource(R.drawable.bubble_black_small);
+                tv_price.setVisibility(View.GONE);
+                tv_price.setTextColor(ContextCompat.getColor(this, R.color.white));
+                tv_name.setTextColor(ContextCompat.getColor(this, R.color.white));
                 break;
             case 1:
-                textView.setBackgroundResource(R.drawable.marker_selected);
+                linearLayout.setBackgroundResource(R.drawable.bubble_black);
+                tv_price.setVisibility(View.VISIBLE);
+                tv_price.setTextColor(ContextCompat.getColor(this, R.color.white));
+                tv_name.setTextColor(ContextCompat.getColor(this, R.color.white));
+
                 break;
             case 2:
-                textView.setBackgroundResource(R.drawable.marker_selected);
+                linearLayout.setBackgroundResource(R.drawable.bubble_black);
+                tv_price.setTextColor(ContextCompat.getColor(this, R.color.white));
+                tv_name.setTextColor(ContextCompat.getColor(this, R.color.white));
+                tv_price.setVisibility(View.VISIBLE);
+
                 break;
         }
-        icon = iconGenerator.makeIcon();
+
+        icon = mIconGenerator.makeIcon();
 
         mSelectedMarker = pcBangRenderer.getMarker(pcBangClusterItem);
         mSelectedMarker.setIcon(BitmapDescriptorFactory.fromBitmap(icon));
     }
-
 
 
     @Override
@@ -742,10 +889,6 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
 
     private void calculate() {
         VisibleRegion vr = googleMap.getProjection().getVisibleRegion();
-        double left = vr.latLngBounds.southwest.longitude;
-        double top = vr.latLngBounds.northeast.latitude;
-        double right = vr.latLngBounds.northeast.longitude;
-        double bottom = vr.latLngBounds.southwest.latitude;
 
         Location center = new Location("center");
         center.setLatitude(vr.latLngBounds.getCenter().latitude);
@@ -756,7 +899,6 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
 
         float dis = Util.calDistance(center.getLatitude(), center.getLongitude(), center_top.getLatitude(), center_top.getLongitude());
 
-        Log.i(TAG, "calculate: " + dis);
     }
 
 
@@ -792,7 +934,7 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
                 case 2:
                     return PCReviewFragment.newInstance(pcBangId);
                 case 3:
-                    return PCMapFragment.newInstance(pcBangId);
+                    return PCBasicFragment.newInstance(pcBangId);
             }
             return null;
         }
