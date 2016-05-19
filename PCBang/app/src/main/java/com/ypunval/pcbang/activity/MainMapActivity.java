@@ -788,10 +788,14 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
 
                     break;
             }
-            icon = mIconGenerator.makeIcon();
-
-            
-            mSelectedMarker.setIcon(BitmapDescriptorFactory.fromBitmap(icon));
+            try{
+                icon = mIconGenerator.makeIcon();
+                mSelectedMarker.setIcon(BitmapDescriptorFactory.fromBitmap(icon));
+            }catch (IllegalStateException e){
+                e.printStackTrace();
+            }catch (IllegalArgumentException e){
+                e.printStackTrace();
+            }
             mSelectedMarker = null;
         }
     }
