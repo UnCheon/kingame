@@ -13,12 +13,14 @@ import android.widget.TextView;
 import com.ypunval.pcbang.R;
 import com.ypunval.pcbang.activity.MainMapActivity;
 import com.ypunval.pcbang.model.PCBang;
+import com.ypunval.pcbang.util.Constant;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import io.realm.Realm;
 
 
-public class PCBasicFragment extends BaseRealmFragment {
+public class PCBasicFragment extends BaseFragment {
 
     @Bind(R.id.nsv)
     NestedScrollView nsv;
@@ -44,7 +46,6 @@ public class PCBasicFragment extends BaseRealmFragment {
 
 
     int pcBangId;
-    PCBang pcBang;
 
 
     public PCBasicFragment() {
@@ -59,7 +60,7 @@ public class PCBasicFragment extends BaseRealmFragment {
     }
 
 
-    public void selectedPCBang(int pcBangId){
+    public void selectedPCBang(int pcBangId) {
         Log.i(TAG, "selectedPCBang: clicked");
         this.pcBangId = pcBangId;
     }
@@ -75,6 +76,7 @@ public class PCBasicFragment extends BaseRealmFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.i(TAG, "onCreateView: ");
 
         View view = null;
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {
@@ -87,37 +89,62 @@ public class PCBasicFragment extends BaseRealmFragment {
         nsv.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
             @Override
             public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-                    Log.i(TAG, "onScrollChange: " + scrollY + "  " + oldScrollY);
-                if (scrollY == 0 && scrollY - oldScrollY < 0){
-                    ((MainMapActivity)getContext()).setCanBottomSheetScroll(true);
-                }else{
-                    ((MainMapActivity)getContext()).setCanBottomSheetScroll(false);
+                Log.i(TAG, "onScrollChange: " + scrollY + "  " + oldScrollY);
+                if (scrollY == 0 && scrollY - oldScrollY < 0) {
+                    ((MainMapActivity) getContext()).setCanBottomSheetScroll(true);
+                } else {
+                    ((MainMapActivity) getContext()).setCanBottomSheetScroll(false);
                 }
             }
         });
+        setData();
 
         return view;
     }
 
 
-    private void setData() {
-        tv_average_rate.setText(pcBang.getAverageRate() + "");
-        tv_review_count.setText(pcBang.getReviewCount() + "");
-        tv_current_seat.setText(pcBang.getLeftSeat() + "");
-        tv_total_seat.setText(pcBang.getTotalSeat() + "");
-        tv_address.setText(pcBang.getAddress1());
-        tv_phone_number.setText(pcBang.getPhoneNumber());
+    public void setData() {
+        Log.d(TAG, "setData: id : "+Constant.pcBangId);
+
+        Realm realm = Realm.getDefaultInstance();
+        PCBang pcBang = realm.where(PCBang.class).equalTo("id", Constant.pcBangId).findFirst();
+        Log.d(TAG, "setData: "+pcBang);
+
+        try {
+
+
+            tv_average_rate.setText(pcBang.getAverageRate() + "");
+            tv_review_count.setText(pcBang.getReviewCount() + "");
+            tv_current_seat.setText(pcBang.getLeftSeat() + "");
+            tv_total_seat.setText(pcBang.getTotalSeat() + "");
+            tv_address.setText(pcBang.getAddress1());
+            tv_phone_number.setText(pcBang.getPhoneNumber());
+
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
+        realm.close();
     }
 
 
     @Override
     public void onStart() {
         Log.i(TAG, "onStart: ");
+
         super.onStart();
-        pcBang = realm.where(PCBang.class).equalTo("id", pcBangId).findFirst();
-        setData();
     }
 
+    @Override
+    public void onStop() {
+        Log.i(TAG, "onStop: ");
+        super.onStop();
+    }
+
+    @Override
+    public void onDestroyView() {
+        Log.i(TAG, "onDestroyView: ");
+        super.onDestroyView();
+    }
 
     @Override
     public void onAttach(Context context) {

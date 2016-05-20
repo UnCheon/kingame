@@ -14,6 +14,11 @@ public class Constant {
     public static final float DEFAULT_KILOMETER = 3.0f;
     public static final float LATITUDE_CONSTANT = 0.0090107f;
     public static final float LONGITUDE_CONSTANT = 0.0112476f;
+
+    public static int pcBangId = 1;
+
+
+
     public static final String GOOGLE_MAP_KEY = "AIzaSyBKpfsEPC8sYp_aTpetzYr4PTQLSV4mIjI";
     public static ArrayList<PCBang> near_pcBangs = new ArrayList<>();
     public static ArrayList<Convenience> conveniences = new ArrayList<>();
@@ -26,6 +31,15 @@ public class Constant {
     public static int subwayRangeKm = 1;
 
     public static PCBang clicked_pcBang;
+
+
+    public static int getPcBangId() {
+        return pcBangId;
+    }
+
+    public static void setPcBangId(int pcBangId) {
+        Constant.pcBangId = pcBangId;
+    }
 
 
     public static void addSelectedConvenience(Convenience convenience) {

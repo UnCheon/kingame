@@ -9,12 +9,15 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
+import android.opengl.Visibility;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.speech.RecognizerIntent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
@@ -29,12 +32,15 @@ import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
@@ -43,6 +49,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.daimajia.slider.library.Indicators.PagerIndicator;
+import com.daimajia.slider.library.SliderLayout;
+import com.daimajia.slider.library.SliderTypes.BaseSliderView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -67,25 +76,32 @@ import com.lapism.searchview.view.SearchCodes;
 import com.lapism.searchview.view.SearchView;
 import com.rey.material.widget.FrameLayout;
 import com.ypunval.pcbang.R;
+import com.ypunval.pcbang.fragment.BaseFragment;
 import com.ypunval.pcbang.fragment.PCBasicFragment;
 import com.ypunval.pcbang.fragment.PCMapFragment;
 import com.ypunval.pcbang.fragment.PCPriceFragment;
 import com.ypunval.pcbang.fragment.PCReviewFragment;
+import com.ypunval.pcbang.listener.PCBangListenerInterface;
 import com.ypunval.pcbang.model.Convenience;
 import com.ypunval.pcbang.model.Dong;
 import com.ypunval.pcbang.model.PCBang;
 import com.ypunval.pcbang.model.Si;
 import com.ypunval.pcbang.model.Subway;
+import com.ypunval.pcbang.model.Sync;
+import com.ypunval.pcbang.update.JSONToRealm;
+import com.ypunval.pcbang.update.PCBangHttpHelper;
 import com.ypunval.pcbang.util.Constant;
 import com.ypunval.pcbang.util.CustomBottomSheetBehavior;
 import com.ypunval.pcbang.util.CustomSearchView;
 import com.ypunval.pcbang.util.PCBangClusterItem;
 import com.ypunval.pcbang.util.PCBangRenderer;
+import com.ypunval.pcbang.util.SliderPCBangInfoView;
 import com.ypunval.pcbang.util.Util;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -94,17 +110,26 @@ import butterknife.ButterKnife;
 import io.realm.Realm;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
+import okhttp3.FormBody;
+import okhttp3.RequestBody;
 
-public class MainMapActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, ClusterManager.OnClusterClickListener<PCBangClusterItem>,
+public class MainMapActivity extends BaseRealmActivity implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, ClusterManager.OnClusterClickListener<PCBangClusterItem>,
         ClusterManager.OnClusterInfoWindowClickListener<PCBangClusterItem>, ClusterManager.OnClusterItemClickListener<PCBangClusterItem>,
         ClusterManager.OnClusterItemInfoWindowClickListener<PCBangClusterItem>, GoogleMap.OnMapClickListener,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+
 
     @Bind(R.id.drawer_layout)
     DrawerLayout drawer;
 
     @Bind(R.id.nav_view)
     NavigationView navigationView;
+
+    @Bind(R.id.slider)
+    SliderLayout slider;
+    @Bind(R.id.custom_indicator)
+    PagerIndicator indicator;
+
     @Bind(R.id.searchView)
     CustomSearchView searchView;
 
@@ -121,6 +146,11 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
     TextView tv_condition;
 
     private static final String TAG = MainMapActivity.class.getName();
+    static final int SPLASH_REQUEST_CODE = 1234;
+    static final int WRITE_REVIEW_CODE = 22;
+    private final long FINISH_INTERVAL_TIME = 2000;
+
+    private long backPressedTime = 0;
 
     //    Google Map
     MapFragment mapFragment;
@@ -141,6 +171,15 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
     private InfoPagerAdapter infoPagerAdapter;
     CustomBottomSheetBehavior customBottomSheetBehavior;
 
+    //  Bottom Sheet State
+    int preBottomSheetState = BottomSheetBehavior.STATE_HIDDEN;
+    float preSlideOffset = -1;
+    int preVpInfoPosition = 0;
+    boolean isAnimating = false;
+    int selectedPCBangId = 1;
+
+
+
     //    search view
     int checkedMenuItem = 0;
     private SearchHistoryTable mHistoryDatabase;
@@ -148,11 +187,6 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
     private int mVersion = SearchCodes.VERSION_TOOLBAR;
     private int mStyle = SearchCodes.STYLE_TOOLBAR_CLASSIC;
     private int mTheme = SearchCodes.THEME_LIGHT;
-
-    //    Realm & SharedPreperence
-    Realm realm;
-    SharedPreferences mPref;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -169,6 +203,12 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
         setInfoView();
         googleApiClient = getLocationApiClient();
 
+//        setSlider();
+        // TODO: 2016. 5. 20. 업데이트하기 주석 제거
+
+        update();
+
+
     }
 
     public void setCanBottomSheetScroll(boolean can) {
@@ -179,9 +219,130 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
     private void setInfoView() {
         customBottomSheetBehavior = (CustomBottomSheetBehavior) BottomSheetBehavior.from(ll_pcBang_info);
         customBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+
         infoPagerAdapter = new InfoPagerAdapter(getSupportFragmentManager());
+        infoPagerAdapter.addFrag(new PCBasicFragment(), "기본정보");
+        infoPagerAdapter.addFrag(new PCPriceFragment(), "요금정보");
+        infoPagerAdapter.addFrag(new PCReviewFragment(), "후기");
         vpInfo.setAdapter(infoPagerAdapter);
         infoTabLayout.setupWithViewPager(vpInfo);
+
+        vpInfo.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                Log.i(TAG, "onPageSelected: "+position);
+//                if (preVpInfoPosition == 2 && customBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+//                    setCanBottomSheetScroll(true);
+//                }
+//                preVpInfoPosition = position;
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                Log.i(TAG, "onPageScrollStateChanged: "+state);
+            }
+        });
+
+
+        customBottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                switch (newState) {
+                    case BottomSheetBehavior.STATE_COLLAPSED:
+                        if (preBottomSheetState == BottomSheetBehavior.STATE_HIDDEN)
+//                            setPCBangData();
+                        Log.i(TAG, "onStateChanged: collapsed");
+                        break;
+                    case BottomSheetBehavior.STATE_EXPANDED:
+                        Log.i(TAG, "onStateChanged: expanded");
+                        break;
+                    case BottomSheetBehavior.STATE_DRAGGING:
+                        if (preBottomSheetState == BottomSheetBehavior.STATE_EXPANDED)
+                            animateSlider(false);
+                        Log.i(TAG, "onStateChanged: dragging");
+                        break;
+                    case BottomSheetBehavior.STATE_HIDDEN:
+                        Log.i(TAG, "onStateChanged: hidden");
+                        break;
+                }
+
+                preBottomSheetState = newState;
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+                if (slideOffset > 0 && slideOffset < 1) {
+                    if (slideOffset > preSlideOffset) {
+                        animateSlider(true);
+                    }else{
+                        animateSlider(false);
+                    }
+
+
+                    preSlideOffset = slideOffset;
+
+
+                }
+            }
+        });
+
+    }
+
+    private void animateSlider(boolean isShowUp) {
+        if (isShowUp) {
+            if (slider.getVisibility() == View.VISIBLE)
+                return;
+
+            Animation animation = AnimationUtils.loadAnimation(this, R.anim.anim_slider_appear);
+            animation.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+            slider.startAnimation(animation);
+            slider.setVisibility(View.VISIBLE);
+            isAnimating = false;
+
+        } else {
+            if (isAnimating)
+                return;
+
+            Animation animation = AnimationUtils.loadAnimation(this, R.anim.anim_slider_disappear);
+            animation.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+                    isAnimating = true;
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    slider.setVisibility(View.GONE);
+                    isAnimating =false;
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+            slider.startAnimation(animation);
+
+        }
     }
 
 
@@ -192,6 +353,15 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
         } else if (searchView != null && searchView.isSearchOpen()) {
             searchView.hide(true);
         } else {
+            long tempTime = System.currentTimeMillis();
+            long intervalTime = tempTime - backPressedTime;
+
+            if (0 <= intervalTime && FINISH_INTERVAL_TIME >= intervalTime) {
+                super.onBackPressed();
+            } else {
+                backPressedTime = tempTime;
+                Toast.makeText(getApplicationContext(), "'뒤로'버튼을한번더누르시면종료됩니다.", Toast.LENGTH_SHORT).show();
+            }
             super.onBackPressed();
         }
     }
@@ -436,8 +606,6 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
 
     @Override
     protected void onStart() {
-        realm = Realm.getDefaultInstance();
-        mPref = PreferenceManager.getDefaultSharedPreferences(this);
         googleApiClient.connect();
         initCategory();
         super.onStart();
@@ -446,7 +614,6 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
     @Override
     protected void onStop() {
         Log.i(TAG, "onStop: called");
-        realm.close();
         googleApiClient.disconnect();
         super.onStop();
     }
@@ -463,7 +630,76 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
                 }
             }
         }
+
+        if (requestCode == PCReviewFragment.WRITE_REVIEW_CODE && resultCode == RESULT_OK) {
+
+        }
+
+        if (requestCode == SPLASH_REQUEST_CODE && resultCode == RESULT_OK) {
+
+        }
+
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void update() {
+
+        Sync sync = realm.where(Sync.class).equalTo("id", 1).findFirst();
+        int period = sync.getPeriod();
+        long timeDifference = System.currentTimeMillis() - sync.getLastRequsetTime();
+
+        if (timeDifference < period * 360000) {
+            Log.i(TAG, "update: 아직 업데이트할만큼 시간이 안됐음 - " + timeDifference);
+            return;
+        }
+
+
+        PCBangListenerInterface.OnPostFinishListener listener = new PCBangListenerInterface.OnPostFinishListener() {
+            @Override
+            public void onPostSuccess(String responseString) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        dismissUpdateDialog();
+                    }
+                });
+                Log.i(TAG, "onPostSuccess");
+                JSONToRealm jsonToRealm = new JSONToRealm(MainMapActivity.this);
+                String status = jsonToRealm.updateResultToRealm(responseString);
+                if (status.equals("success")) {
+
+                } else if (status.equals("empty")) {
+
+                } else if (status.equals("fail")) {
+
+                }
+            }
+
+            @Override
+            public void onPostFailure() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        dismissUpdateDialog();
+                    }
+                });
+                Log.i(TAG, "onPostFailure");
+//            Todo: network fail 처리
+            }
+        };
+
+        RequestBody formBody = new FormBody.Builder()
+                .add("last_updated", "2016-05-20 11:49:00.114900+00:00")
+                .build();
+
+        PCBangHttpHelper pcBangHttpHelper = new PCBangHttpHelper();
+        pcBangHttpHelper.post(formBody, getResources().getString(R.string.url_pcbang_update), listener);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                showUpdateDialog();
+            }
+        });
     }
 
 
@@ -706,13 +942,18 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
     }
 
 
-    private void setPCBangData(int pcBangId) {
+    private void setPCBangData() {
         customBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
-        ((PCBasicFragment) infoPagerAdapter.getItem(0)).selectedPCBang(pcBangId);
-        ((PCPriceFragment) infoPagerAdapter.getItem(1)).selectedPCBang(pcBangId);
-        ((PCReviewFragment) infoPagerAdapter.getItem(2)).selectedPCBang(pcBangId);
-        ((PCBasicFragment) infoPagerAdapter.getItem(3)).selectedPCBang(pcBangId);
+//        for (int i = 0 ; i < getSupportFragmentManager().getFragments().size() ; i++) {
+//            if (getSupportFragmentManager().getFragments().get(i) instanceof PCBasicFragment) {
+//                ((PCBasicFragment) getSupportFragmentManager().getFragments().get(i)).setData();
+//            } else if (getSupportFragmentManager().getFragments().get(i) instanceof PCPriceFragment) {
+//                ((PCPriceFragment) getSupportFragmentManager().getFragments().get(i)).setData();
+//            } else if (getSupportFragmentManager().getFragments().get(i) instanceof PCReviewFragment) {
+//                ((PCReviewFragment) getSupportFragmentManager().getFragments().get(i)).setData();
+//            }
+//        }
     }
 
 
@@ -742,14 +983,18 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
 
     @Override
     public boolean onClusterItemClick(PCBangClusterItem pcBangClusterItem) {
-        Log.i("cluster item", "click");
-
+        Log.i("cluster item", "pcBangId : "+pcBangClusterItem.getId());
+        Constant.setPcBangId(pcBangClusterItem.getId());
         deselectMarker();
         selectMarker(pcBangClusterItem);
-        setPCBangData(pcBangClusterItem.getId());
+        setPCBangData();
         vpInfo.setCurrentItem(0);
 
         return false;
+    }
+
+    public int getPCBangId(){
+        return selectedPCBangId;
     }
 
     private void deselectMarker() {
@@ -788,12 +1033,12 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
 
                     break;
             }
-            try{
+            try {
                 icon = mIconGenerator.makeIcon();
                 mSelectedMarker.setIcon(BitmapDescriptorFactory.fromBitmap(icon));
-            }catch (IllegalStateException e){
+            } catch (IllegalStateException e) {
                 e.printStackTrace();
-            }catch (IllegalArgumentException e){
+            } catch (IllegalArgumentException e) {
                 e.printStackTrace();
             }
             mSelectedMarker = null;
@@ -923,6 +1168,15 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
 
 
     public class InfoPagerAdapter extends FragmentPagerAdapter {
+        private final List<Fragment> mFragmentList = new ArrayList<>();
+        private final List<String> mFragmentTitleList = new ArrayList<>();
+
+        public void addFrag(Fragment fragment, String title){
+            mFragmentList.add(fragment);
+            mFragmentTitleList.add(title);
+        }
+
+
 
         public InfoPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -930,37 +1184,57 @@ public class MainMapActivity extends AppCompatActivity implements NavigationView
 
         @Override
         public Fragment getItem(int position) {
-            switch (position) {
-                case 0:
-                    return PCBasicFragment.newInstance(pcBangId);
-                case 1:
-                    return PCPriceFragment.newInstance(pcBangId);
-                case 2:
-                    return PCReviewFragment.newInstance(pcBangId);
-                case 3:
-                    return PCBasicFragment.newInstance(pcBangId);
-            }
-            return null;
+
+            return mFragmentList.get(position);
         }
+
+
 
         @Override
         public int getCount() {
-            return 4;
+            return mFragmentList.size();
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
-            switch (position) {
-                case 0:
-                    return "기본정보";
-                case 1:
-                    return "요금정보";
-                case 2:
-                    return "후기·별점";
-                case 3:
-                    return "지도보기";
-            }
-            return null;
+            return mFragmentTitleList.get(position);
         }
+    }
+
+
+
+
+    private void setSlider() {
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        int device_width = displayMetrics.widthPixels;
+        int device_height = displayMetrics.heightPixels;
+
+        int ll_pcbang_info_height = (int) getResources().getDimension(R.dimen.ll_pcbang_info_height);
+
+        int height = device_height - ll_pcbang_info_height;
+
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, height);
+        slider.setLayoutParams(params);
+
+
+        HashMap<String, String> url_maps = new HashMap<String, String>();
+        url_maps.put("Hannibal", "http://static2.hypable.com/wp-content/uploads/2013/12/hannibal-season-2-release-date.jpg");
+        url_maps.put("Big Bang Theory", "http://tvfiles.alphacoders.com/100/hdclearart-10.png");
+        url_maps.put("House of Cards", "http://cdn3.nflximg.net/images/3093/2043093.jpg");
+        url_maps.put("Game of Thrones", "http://images.boomsbeat.com/data/images/full/19640/game-of-thrones-season-4-jpg.jpg");
+
+        for (String name : url_maps.keySet()) {
+            SliderPCBangInfoView sliderView = new SliderPCBangInfoView(this);
+            sliderView.image(url_maps.get(name)).setScaleType(BaseSliderView.ScaleType.Fit);
+            sliderView.bundle(new Bundle());
+            sliderView.getBundle().putString("extra", name);
+
+            slider.addSlider(sliderView);
+        }
+
+        slider.setPresetTransformer(SliderLayout.Transformer.Accordion);
+        slider.setPresetIndicator(SliderLayout.PresetIndicators.Center_Bottom);
+        slider.setDuration(4000);
+
     }
 }

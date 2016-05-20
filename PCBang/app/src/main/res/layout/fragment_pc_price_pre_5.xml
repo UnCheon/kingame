@@ -7,8 +7,7 @@
     android:name="com.ypunval.pcbang.PCBasicFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="2dp"
-    android:paddingRight="2dp"
+
     tools:context=".fragment.PCBasicFragment">
 
     <LinearLayout
@@ -22,10 +21,9 @@
             android:layout_width="match_parent"
             app:cardCornerRadius="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="13dp"
-            android:layout_marginLeft="3dp"
-            android:layout_marginRight="3dp"
-            android:layout_marginBottom="3dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
             android:background="@color/white">
 
             <TableLayout

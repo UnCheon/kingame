@@ -14,12 +14,14 @@ import android.widget.TableLayout;
 import com.ypunval.pcbang.R;
 import com.ypunval.pcbang.activity.MainMapActivity;
 import com.ypunval.pcbang.model.PCBang;
+import com.ypunval.pcbang.util.Constant;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import io.realm.Realm;
 
 
-public class PCPriceFragment extends BaseRealmFragment {
+public class PCPriceFragment extends BaseFragment {
     private static final String TAG = PCPriceFragment.class.getName();
 
     int pcBangId;
@@ -49,7 +51,20 @@ public class PCPriceFragment extends BaseRealmFragment {
 
     public void selectedPCBang(int pcBangId){
         this.pcBangId = pcBangId;
+
         Log.i(TAG, "selectedPCBang: clicked");
+    }
+
+    public void setData() {
+        Realm realm = Realm.getDefaultInstance();
+        try{
+            PCBang pcBang = realm.where(PCBang.class).equalTo("id", Constant.pcBangId).findFirst();
+        }catch (NullPointerException e){
+            e.printStackTrace();
+        }
+
+        realm.close();
+
     }
 
     @Override
@@ -63,6 +78,7 @@ public class PCPriceFragment extends BaseRealmFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.i(TAG, "onCreateView: ");
 
         View parent_view = null;
         if(Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT){
@@ -85,6 +101,8 @@ public class PCPriceFragment extends BaseRealmFragment {
             }
         });
 
+        setData();
+
 
 
         return parent_view;
@@ -101,14 +119,20 @@ public class PCPriceFragment extends BaseRealmFragment {
 
     @Override
     public void onStart() {
+        Log.i(TAG, "onStart: ");
         super.onStart();
-        pcBang = realm.where(PCBang.class).equalTo("id", pcBangId).findFirst();
-
     }
 
     @Override
     public void onStop() {
+        Log.i(TAG, "onStop: ");
         super.onStop();
+    }
+
+    @Override
+    public void onDestroyView() {
+        Log.i(TAG, "onDestroyView: ");
+        super.onDestroyView();
     }
 
     @Override

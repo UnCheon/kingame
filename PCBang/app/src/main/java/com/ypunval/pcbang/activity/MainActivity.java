@@ -50,9 +50,11 @@ import io.realm.RealmResults;
 
 public class MainActivity extends BaseRealmActivity {
 
-    private final long FINSH_INTERVAL_TIME = 2000;
+
     private final String TAG = "MAINACTIVITY";
     static final int SPLASH_REQUEST_CODE = 1234;
+    static final int WRITE_REVIEW_CODE = 22;
+    private final long FINSH_INTERVAL_TIME = 2000;
 
     private long backPressedTime = 0;
 
@@ -64,6 +66,8 @@ public class MainActivity extends BaseRealmActivity {
     public static ArrayList<Convenience> selected_conveniences;
     public static String[] sorts;
     public static String current_sort;
+
+
 
 
     SharedPreferences mPref;
@@ -105,6 +109,10 @@ public class MainActivity extends BaseRealmActivity {
             result = getResources().getDimensionPixelSize(resourceId);
         }
         return result;
+    }
+
+    private void update() {
+
     }
 
 
@@ -374,6 +382,10 @@ public class MainActivity extends BaseRealmActivity {
 
         if (requestCode == SPLASH_REQUEST_CODE && resultCode == RESULT_OK) {
             setOnCreateMethod();
+
+        }
+
+        if (requestCode == WRITE_REVIEW_CODE && resultCode == RESULT_OK) {
 
         }
 

@@ -45,6 +45,9 @@
     <dimen name="marker_glow_padding_bottom">20dp</dimen>
 
 
+    <dimen name="ll_pcbang_info_height">400dp</dimen>
+
+
 
 
     <dimen name="drawer_width">240dp</dimen>

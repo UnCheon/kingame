@@ -3,6 +3,14 @@
     <string name="action_settings">Settings</string>
     <string name="section_format">Hello World from section: %1$d</string>
 
+
+    <!-- URL -->
+    <string name="base_url">http://52.79.208.39:8000/</string>
+    <string name="url_pcbang_update">http://52.79.208.39:8000/PCBang/update</string>
+    <string name="url_register">http://52.79.208.39:8000/PCBang/update</string>
+    <string name="url_review_write">http://52.79.208.39:8000/Review/set</string>
+
+
     <!-- Api Keys -->
 
 
