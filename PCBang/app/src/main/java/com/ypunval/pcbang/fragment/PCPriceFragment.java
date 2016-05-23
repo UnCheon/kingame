@@ -1,10 +1,13 @@
 package com.ypunval.pcbang.fragment;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.CardView;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,6 +36,8 @@ public class PCPriceFragment extends BaseRealmFragment {
 
     @Bind(R.id.price_table)
     TableLayout price_table;
+    @Bind(R.id.report_information)
+    CardView report_information;
 
     public PCPriceFragment(){
 
@@ -77,11 +82,36 @@ public class PCPriceFragment extends BaseRealmFragment {
         nsv.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
             @Override
             public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-                if (scrollY == 0 && scrollY - oldScrollY < 0){
-                    ((MainMapActivity)getContext()).setCanBottomSheetScroll(true);
-                }else{
-                    ((MainMapActivity)getContext()).setCanBottomSheetScroll(false);
+                if (scrollY == 0 && scrollY - oldScrollY < 0) {
+                    ((MainMapActivity) getContext()).setCanBottomSheetScroll(true);
+                } else {
+                    ((MainMapActivity) getContext()).setCanBottomSheetScroll(false);
                 }
+            }
+        });
+
+        report_information.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String subject = " 정보 제공하기 ";
+                String body = "<h1> 정보를 제공해주세요! <h1><br> 가격표에 해당하는 사진을 찍어 첨부해주세요";
+
+//                final Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
+//                emailIntent.setType("text/html");
+//                emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, subject);
+//                emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, Html.fromHtml(body));
+//                startActivity(Intent.createChooser(emailIntent, "Email:"));
+
+                Intent sendIntent = new Intent(Intent.ACTION_VIEW);
+                sendIntent.setType("plain/text");
+                sendIntent.setData(Uri.parse("ypunval@gmail.com"));
+                sendIntent.setClassName("com.google.android.gm", "com.google.android.gm.ComposeActivityGmail");
+                sendIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{"ypunval@gmail.com"});
+                sendIntent.putExtra(Intent.EXTRA_SUBJECT, "피씨방 가격정보 제보");
+                sendIntent.putExtra(Intent.EXTRA_TEXT, Html.fromHtml(body));
+                startActivity(sendIntent);
+
+
             }
         });
 
@@ -90,10 +120,18 @@ public class PCPriceFragment extends BaseRealmFragment {
         return parent_view;
     }
     public void makePriceView(LayoutInflater inflater, View parent_view){
+        int data_length = 0;
+        if (data_length == 0) {
+            View price_table_empty = inflater.inflate(R.layout.price_table_empty, null, false);
+            View user_submit_button = inflater.inflate(R.layout.user_submit_button, null, false);
+            price_table.addView(price_table_empty);
+//            price_table.addView(user_submit_button);
 
-        for(int i = 0; i < 3; i++) {
-            View price_table_row = inflater.inflate(R.layout.price_table_row, null, false);
-            price_table.addView(price_table_row);
+        } else {
+            for (int i = 0; i < data_length; i++) {
+                View price_table_row = inflater.inflate(R.layout.price_table_row, null, false);
+                price_table.addView(price_table_row);
+            }
         }
 
 
