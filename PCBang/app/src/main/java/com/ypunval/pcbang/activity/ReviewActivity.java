@@ -27,6 +27,7 @@ import com.ypunval.pcbang.model.PCBang;
 import com.ypunval.pcbang.model.Sync;
 import com.ypunval.pcbang.update.JSONToRealm;
 import com.ypunval.pcbang.update.PCBangHttpHelper;
+import com.ypunval.pcbang.util.Constant;
 
 
 import butterknife.Bind;
@@ -52,7 +53,6 @@ public class ReviewActivity extends BaseRealmActivity {
     @Bind(R.id.tv_rating_text)
     TextView tv_rating_text;
 
-    int pcBangId;
 
     @OnClick(R.id.ll_et_review)
     public void edit_review(View v) {
@@ -86,9 +86,8 @@ public class ReviewActivity extends BaseRealmActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        pcBangId = getIntent().getIntExtra("pcBangId", 0);
 
-        PCBang pcBang = realm.where(PCBang.class).equalTo("id", pcBangId).findFirst();
+        PCBang pcBang = realm.where(PCBang.class).equalTo("id", Constant.pcBangId).findFirst();
         setTitle(pcBang.getName());
 
 
@@ -196,16 +195,18 @@ public class ReviewActivity extends BaseRealmActivity {
         Sync sync = realm.where(Sync.class).equalTo("id", 1).findFirst();
         String last_updated = sync.getUpdated();
 
+        Log.i(TAG, "writeReview: last_updated : " + last_updated);
+
         // TODO: 2016. 5. 20. last updated 가짜 데이터 진짜로 바꾸기
+
         RequestBody formBody = new FormBody.Builder()
-//                .add("last_updated", "2016-05-11 10:00:00")
+                .add("pcbang", Constant.pcBangId+"")
                 .add("last_updated", sync.getUpdated())
-                .add("pcbang", pcBangId+"")
                 .add("content", content)
                 .add("rate", rate+"")
                 .add("phone_number", phoneNumber)
-
                 .build();
+
 
         PCBangHttpHelper pcBangHttpHelper = new PCBangHttpHelper();
         pcBangHttpHelper.post(formBody, getResources().getString(R.string.url_review_write), listener);

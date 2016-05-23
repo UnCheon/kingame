@@ -27,6 +27,7 @@ public class PCBangHttpHelper {
             .writeTimeout(15, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
             .build();
+
     private static final String TAG = "PCBangHttpHelper";
 
     public String get(String url) throws IOException {
@@ -36,7 +37,6 @@ public class PCBangHttpHelper {
     }
 
     public void post(RequestBody body, String url, final PCBangListenerInterface.OnPostFinishListener listener) {
-        Log.i(TAG, "post : " + body.toString());
         Request request = new Request.Builder().url(url).post(body).build();
 
         client.newCall(request).enqueue(new Callback() {

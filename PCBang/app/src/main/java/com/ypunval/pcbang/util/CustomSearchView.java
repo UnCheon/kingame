@@ -480,6 +480,7 @@ public class CustomSearchView extends FrameLayout implements Filter.FilterListen
     }
 
     private void in() {
+        mIsSearchOpen = true;
         showKeyboard();
         showSuggestions();
         mShadow.setVisibility(View.VISIBLE);

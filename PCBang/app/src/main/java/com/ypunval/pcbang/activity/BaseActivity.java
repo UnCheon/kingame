@@ -37,10 +37,13 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     public void dismissReviewDialog() {
-        if (pd.isShowing()){
-            pd.dismiss();
-            pd = null;
+        if (pd != null){
+            if (pd.isShowing()){
+                pd.dismiss();
+                pd = null;
+            }
         }
+
     }
 
     public void showNicknameDialog() {

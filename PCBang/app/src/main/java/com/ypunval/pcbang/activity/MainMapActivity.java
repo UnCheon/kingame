@@ -43,6 +43,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -74,7 +75,6 @@ import com.lapism.searchview.adapter.SearchItem;
 import com.lapism.searchview.history.SearchHistoryTable;
 import com.lapism.searchview.view.SearchCodes;
 import com.lapism.searchview.view.SearchView;
-import com.rey.material.widget.FrameLayout;
 import com.ypunval.pcbang.R;
 import com.ypunval.pcbang.fragment.BaseFragment;
 import com.ypunval.pcbang.fragment.PCBasicFragment;
@@ -125,6 +125,8 @@ public class MainMapActivity extends BaseRealmActivity implements NavigationView
     @Bind(R.id.nav_view)
     NavigationView navigationView;
 
+    @Bind(R.id.fl_slider)
+    FrameLayout fl_slider;
     @Bind(R.id.slider)
     SliderLayout slider;
     @Bind(R.id.custom_indicator)
@@ -199,14 +201,17 @@ public class MainMapActivity extends BaseRealmActivity implements NavigationView
         ButterKnife.bind(this);
 
 
+
         setSearchView();
+
+
         setInfoView();
         googleApiClient = getLocationApiClient();
 
-//        setSlider();
+        setSlider();
         // TODO: 2016. 5. 20. 업데이트하기 주석 제거
 
-        update();
+//        update();
 
 
     }
@@ -294,7 +299,7 @@ public class MainMapActivity extends BaseRealmActivity implements NavigationView
 
     private void animateSlider(boolean isShowUp) {
         if (isShowUp) {
-            if (slider.getVisibility() == View.VISIBLE)
+            if (fl_slider.getVisibility() == View.VISIBLE)
                 return;
 
             Animation animation = AnimationUtils.loadAnimation(this, R.anim.anim_slider_appear);
@@ -314,8 +319,8 @@ public class MainMapActivity extends BaseRealmActivity implements NavigationView
 
                 }
             });
-            slider.startAnimation(animation);
-            slider.setVisibility(View.VISIBLE);
+            fl_slider.startAnimation(animation);
+            fl_slider.setVisibility(View.VISIBLE);
             isAnimating = false;
 
         } else {
@@ -331,7 +336,7 @@ public class MainMapActivity extends BaseRealmActivity implements NavigationView
 
                 @Override
                 public void onAnimationEnd(Animation animation) {
-                    slider.setVisibility(View.GONE);
+                    fl_slider.setVisibility(View.GONE);
                     isAnimating =false;
                 }
 
@@ -340,7 +345,7 @@ public class MainMapActivity extends BaseRealmActivity implements NavigationView
 
                 }
             });
-            slider.startAnimation(animation);
+            fl_slider.startAnimation(animation);
 
         }
     }
@@ -348,21 +353,24 @@ public class MainMapActivity extends BaseRealmActivity implements NavigationView
 
     @Override
     public void onBackPressed() {
+        Log.i(TAG, "onBackPressed: "+searchView.isSearchOpen()+"");
         if (drawer != null && drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else if (searchView != null && searchView.isSearchOpen()) {
             searchView.hide(true);
+        } else if (ll_pcBang_info != null && customBottomSheetBehavior.getState() != BottomSheetBehavior.STATE_HIDDEN) {
+            customBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         } else {
+
             long tempTime = System.currentTimeMillis();
             long intervalTime = tempTime - backPressedTime;
 
-            if (0 <= intervalTime && FINISH_INTERVAL_TIME >= intervalTime) {
+            if (0 <= intervalTime && FINISH_INTERVAL_TIME >= intervalTime && backPressedTime > 0) {
                 super.onBackPressed();
             } else {
                 backPressedTime = tempTime;
                 Toast.makeText(getApplicationContext(), "'뒤로'버튼을한번더누르시면종료됩니다.", Toast.LENGTH_SHORT).show();
             }
-            super.onBackPressed();
         }
     }
 
@@ -460,13 +468,17 @@ public class MainMapActivity extends BaseRealmActivity implements NavigationView
                 searchPlace(text.toString());
             }
         });
-
+        mSuggestionsList.clear();
+        mSuggestionsList.addAll(mHistoryDatabase.getAllItems());
         searchView.setAdapter(mSearchAdapter);
-        showSearchView();
+
         CardView cardView = searchView.getCardView();
         FrameLayout.LayoutParams cvParams = (FrameLayout.LayoutParams) cardView.getLayoutParams();
         cvParams.topMargin += getStatusBarHeight();
         cardView.setLayoutParams(cvParams);
+
+        searchView.hide(false);
+
     }
 
     private void searchPlace(String query) {
@@ -563,6 +575,7 @@ public class MainMapActivity extends BaseRealmActivity implements NavigationView
         }
     }
 
+
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -592,17 +605,7 @@ public class MainMapActivity extends BaseRealmActivity implements NavigationView
         if (checkedMenuItem > -1) {
             navigationView.getMenu().getItem(checkedMenuItem).setChecked(true);
         }
-
     }
-
-
-    private void showSearchView() {
-        mSuggestionsList.clear();
-        mSuggestionsList.addAll(mHistoryDatabase.getAllItems());
-        mSuggestionsList.add(new SearchItem("Google"));
-        mSuggestionsList.add(new SearchItem("Android"));
-    }
-
 
     @Override
     protected void onStart() {
@@ -621,6 +624,7 @@ public class MainMapActivity extends BaseRealmActivity implements NavigationView
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.i(TAG, "onActivityResult: ");
         if (requestCode == SearchView.SPEECH_REQUEST_CODE && resultCode == RESULT_OK) {
             List<String> results = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
             if (results != null && results.size() > 0) {
@@ -647,6 +651,8 @@ public class MainMapActivity extends BaseRealmActivity implements NavigationView
         Sync sync = realm.where(Sync.class).equalTo("id", 1).findFirst();
         int period = sync.getPeriod();
         long timeDifference = System.currentTimeMillis() - sync.getLastRequsetTime();
+
+        Log.i(TAG, "update: "+sync.getUpdated());
 
         if (timeDifference < period * 360000) {
             Log.i(TAG, "update: 아직 업데이트할만큼 시간이 안됐음 - " + timeDifference);
@@ -688,8 +694,9 @@ public class MainMapActivity extends BaseRealmActivity implements NavigationView
             }
         };
 
+
         RequestBody formBody = new FormBody.Builder()
-                .add("last_updated", "2016-05-20 11:49:00.114900+00:00")
+                .add("last_updated", sync.getUpdated())
                 .build();
 
         PCBangHttpHelper pcBangHttpHelper = new PCBangHttpHelper();
@@ -1205,6 +1212,7 @@ public class MainMapActivity extends BaseRealmActivity implements NavigationView
 
 
     private void setSlider() {
+
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
         int device_width = displayMetrics.widthPixels;
         int device_height = displayMetrics.heightPixels;
@@ -1217,11 +1225,12 @@ public class MainMapActivity extends BaseRealmActivity implements NavigationView
         slider.setLayoutParams(params);
 
 
+
         HashMap<String, String> url_maps = new HashMap<String, String>();
-        url_maps.put("Hannibal", "http://static2.hypable.com/wp-content/uploads/2013/12/hannibal-season-2-release-date.jpg");
-        url_maps.put("Big Bang Theory", "http://tvfiles.alphacoders.com/100/hdclearart-10.png");
-        url_maps.put("House of Cards", "http://cdn3.nflximg.net/images/3093/2043093.jpg");
-        url_maps.put("Game of Thrones", "http://images.boomsbeat.com/data/images/full/19640/game-of-thrones-season-4-jpg.jpg");
+        url_maps.put("Hannibal", "https://s3-ap-northeast-1.amazonaws.com/ypunval4/pcbang/test_images/pcbang_sample3.jpg?X-Amz-Date=20160523T013147Z&X-Amz-Expires=300&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Signature=0490e0f53047b7c918bfc74bd96a29dcef5b6c467daa5d09e7f8f24e8569db49&X-Amz-Credential=ASIAJO2R6Z7SNQJTWPTQ/20160523/ap-northeast-1/s3/aws4_request&X-Amz-SignedHeaders=Host&x-amz-security-token=FQoDYXdzEDsaDCE3IOS8QX0dZRk3YiLHAS5jHW27dhFsZMCnLfEKJZlgYQ23DIgNoZToe9QlTivtS78CyB%2Bw/Cbi5dONH7l/Yd3t7IJXDrnGsddTnxkIeKpDNlQOAxO3g5Ih0UQKoAikPCIfAFhFx/NlXzdn3e1a4Ry%2BP1jfxojK7hs7vMS3dyILsJ7EIeV9iE7wErujsNeZ5cYoWhtuiqcGxXdisRBdKZbFzDKgjd9rhdyy0qaH2tU4gvkhknnsS6M1DtbNc8JdXd70%2BMvMcIMbKRexS9Md0QRoOLiuboQorrqJugU%3D");
+        url_maps.put("Big Bang Theory", "https://s3-ap-northeast-1.amazonaws.com/ypunval4/pcbang/test_images/pc2.jpg?X-Amz-Date=20160523T013110Z&X-Amz-Expires=300&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Signature=bdea04f38fea20ee177b44d4f5eef139d35c1dc0e2e2412dbedd631531c25b12&X-Amz-Credential=ASIAJO2R6Z7SNQJTWPTQ/20160523/ap-northeast-1/s3/aws4_request&X-Amz-SignedHeaders=Host&x-amz-security-token=FQoDYXdzEDsaDCE3IOS8QX0dZRk3YiLHAS5jHW27dhFsZMCnLfEKJZlgYQ23DIgNoZToe9QlTivtS78CyB%2Bw/Cbi5dONH7l/Yd3t7IJXDrnGsddTnxkIeKpDNlQOAxO3g5Ih0UQKoAikPCIfAFhFx/NlXzdn3e1a4Ry%2BP1jfxojK7hs7vMS3dyILsJ7EIeV9iE7wErujsNeZ5cYoWhtuiqcGxXdisRBdKZbFzDKgjd9rhdyy0qaH2tU4gvkhknnsS6M1DtbNc8JdXd70%2BMvMcIMbKRexS9Md0QRoOLiuboQorrqJugU%3D");
+        url_maps.put("House of Cards", "https://s3-ap-northeast-1.amazonaws.com/ypunval4/pcbang/test_images/pcbang_sample2.jpg?X-Amz-Date=20160523T013135Z&X-Amz-Expires=300&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Signature=c33178b44d0a009c7f20ac512ba6eda10275fb119ad89b246fb9352197ab8043&X-Amz-Credential=ASIAJO2R6Z7SNQJTWPTQ/20160523/ap-northeast-1/s3/aws4_request&X-Amz-SignedHeaders=Host&x-amz-security-token=FQoDYXdzEDsaDCE3IOS8QX0dZRk3YiLHAS5jHW27dhFsZMCnLfEKJZlgYQ23DIgNoZToe9QlTivtS78CyB%2Bw/Cbi5dONH7l/Yd3t7IJXDrnGsddTnxkIeKpDNlQOAxO3g5Ih0UQKoAikPCIfAFhFx/NlXzdn3e1a4Ry%2BP1jfxojK7hs7vMS3dyILsJ7EIeV9iE7wErujsNeZ5cYoWhtuiqcGxXdisRBdKZbFzDKgjd9rhdyy0qaH2tU4gvkhknnsS6M1DtbNc8JdXd70%2BMvMcIMbKRexS9Md0QRoOLiuboQorrqJugU%3D");
+        url_maps.put("Game of Thrones", "https://s3-ap-northeast-1.amazonaws.com/ypunval4/pcbang/test_images/pcbang_sample4.jpg?X-Amz-Date=20160523T013200Z&X-Amz-Expires=300&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Signature=eebbfe264aacf8422096930e2b28eb679f7bdf1c5ef80ade30bb84301b52c0f1&X-Amz-Credential=ASIAJO2R6Z7SNQJTWPTQ/20160523/ap-northeast-1/s3/aws4_request&X-Amz-SignedHeaders=Host&x-amz-security-token=FQoDYXdzEDsaDCE3IOS8QX0dZRk3YiLHAS5jHW27dhFsZMCnLfEKJZlgYQ23DIgNoZToe9QlTivtS78CyB%2Bw/Cbi5dONH7l/Yd3t7IJXDrnGsddTnxkIeKpDNlQOAxO3g5Ih0UQKoAikPCIfAFhFx/NlXzdn3e1a4Ry%2BP1jfxojK7hs7vMS3dyILsJ7EIeV9iE7wErujsNeZ5cYoWhtuiqcGxXdisRBdKZbFzDKgjd9rhdyy0qaH2tU4gvkhknnsS6M1DtbNc8JdXd70%2BMvMcIMbKRexS9Md0QRoOLiuboQorrqJugU%3D");
 
         for (String name : url_maps.keySet()) {
             SliderPCBangInfoView sliderView = new SliderPCBangInfoView(this);

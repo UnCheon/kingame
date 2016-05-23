@@ -137,12 +137,11 @@ public class JSONToRealm {
                     JSONObject jsonObject = review_list.getJSONObject(i);
                     JSONObject obj = jsonObject.getJSONObject("fields");
 
-
                     Review review = new Review();
                     review.setCreated(obj.getString("created"));
                     review.setContent(obj.getString("content"));
                     review.setRate((float) obj.getDouble("rate"));
-                    review.setPhoneNumber(obj.getString("phoneNumber"));
+                    review.setPhoneNumber(obj.getString("phone_number"));
                     int pcBang_id = obj.getInt("pcbang");
                     review.setNickname(obj.getString("nickname"));
                     review.setId(jsonObject.getInt("pk"));
@@ -153,7 +152,6 @@ public class JSONToRealm {
                     reviews.add(review);
                 }
 
-
                 Sync sync = realm.where(Sync.class).equalTo("id", 1).findFirst();
                 sync.setS3(sync_obj.getString("s3_url"));
                 sync.setUpdated(sync_obj.getString("last_updated"));
@@ -162,7 +160,6 @@ public class JSONToRealm {
 
                 realm.copyToRealmOrUpdate(pcBangs);
                 realm.copyToRealmOrUpdate(reviews);
-
 
                 realm.commitTransaction();
 
@@ -186,9 +183,4 @@ public class JSONToRealm {
 
         return status;
     }
-
-
-
-
-
 }
