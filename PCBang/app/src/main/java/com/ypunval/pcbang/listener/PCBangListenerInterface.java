@@ -36,6 +36,9 @@ public class PCBangListenerInterface {
         void onNearByFooterClick();
     }
 
+    public interface OnLocationChangeListener{
+        void onLocationChange(double latitude, double longitude);
+    }
 
     public interface OnReviewClickListener {
         void onReviewClick(Review review);
@@ -43,8 +46,19 @@ public class PCBangListenerInterface {
     }
 
 
-    public interface OnPostFinishListener {
-        void onPostSuccess(String responseString);
-        void onPostFailure();
+    public interface  OnFinishRegisterListener {
+        void onSuccessRegister(String responseString);
+        void onFailureNetwork();
+    }
+
+
+    public interface OnUpdateListener {
+        void onSuccessUpdate(String responseString);
+        void onFailureNetwork();
+    }
+
+    public interface OnNicknameListener {
+        void onSuccessNickname(String responseString);
+        void onFailureNetwork();
     }
 }

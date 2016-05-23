@@ -9,44 +9,8 @@
     <dimen name="custom_profile_image">50dp</dimen>
     <dimen name="custom_profile_padding">2dp</dimen>
 
-
+    <dimen name="marker_height">20dp</dimen>
     <dimen name="marker_padding">8dp</dimen>
-
-
-    <dimen name="marker_width">70dp</dimen>
-    <dimen name="marker_height">47dp</dimen>
-
-    <dimen name="marker_small_width">70dp</dimen>
-    <dimen name="marker_small_height">31dp</dimen>
-
-    <dimen name="marker_padding_left">2dp</dimen>
-    <dimen name="marker_padding_top">3dp</dimen>
-    <dimen name="marker_padding_right">4dp</dimen>
-    <dimen name="marker_padding_bottom">12dp</dimen>
-
-    <dimen name="marker_small_padding_left">2dp</dimen>
-    <dimen name="marker_small_padding_top">3dp</dimen>
-    <dimen name="marker_small_padding_right">4dp</dimen>
-    <dimen name="marker_small_padding_bottom">12dp</dimen>
-
-    <dimen name="marker_text_width">64dp</dimen>
-
-
-
-
-
-
-    <dimen name="marker_glow_width">80dp</dimen>
-    <dimen name="marker_glow_height">65dp</dimen>
-
-    <dimen name="marker_glow_padding_left">8dp</dimen>
-    <dimen name="marker_glow_padding_top">10dp</dimen>
-    <dimen name="marker_glow_padding_right">8dp</dimen>
-    <dimen name="marker_glow_padding_bottom">20dp</dimen>
-
-
-    <dimen name="ll_pcbang_info_height">400dp</dimen>
-
 
 
 

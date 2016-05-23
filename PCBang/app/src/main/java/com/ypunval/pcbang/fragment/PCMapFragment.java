@@ -189,7 +189,7 @@ public class PCMapFragment extends BaseRealmFragment implements ClusterManager.O
         mClusterManager.setOnClusterItemInfoWindowClickListener(this);
 
         PCBang pcBang = realm.where(PCBang.class).equalTo("id", pcBangId).findFirst();
-        PCBangClusterItem item = new PCBangClusterItem();
+        PCBangClusterItem item = new PCBangClusterItem(pcBang);
         mClusterManager.addItem(item);
         mClusterManager.cluster();
 

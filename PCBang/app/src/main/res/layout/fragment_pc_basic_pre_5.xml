@@ -6,7 +6,8 @@
     android:name="com.ypunval.pcbang.PCBasicFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
+    android:paddingLeft="0dp"
+    android:paddingRight="0dp"
     tools:context=".fragment.PCBasicFragment">
 
     <LinearLayout
@@ -20,8 +21,6 @@
             app:cardCornerRadius="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:layout_marginLeft="2dp"
-            android:layout_marginRight="2dp"
             android:background="@color/white">
 
 
@@ -170,8 +169,6 @@
             app:cardCornerRadius="0dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="2dp"
-            android:layout_marginRight="2dp"
             android:background="#fff">
 
             <LinearLayout
@@ -260,8 +257,6 @@
         <android.support.v7.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="2dp"
-            android:layout_marginRight="2dp"
             app:cardCornerRadius="0dp"
             >
 

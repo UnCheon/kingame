@@ -6,8 +6,6 @@ import android.content.res.AssetManager;
 import android.support.multidex.MultiDex;
 import android.util.Log;
 
-import com.facebook.stetho.Stetho;
-import com.uphyca.stetho_realm.RealmInspectorModulesProvider;
 import com.ypunval.pcbang.util.PCBangRealmModule;
 
 import java.io.File;
@@ -35,11 +33,11 @@ public class MyApplication extends Application {
 
         Realm.setDefaultConfiguration(pcBangConfig);
 
-        Stetho.initialize(
-                Stetho.newInitializerBuilder(this)
-                        .enableDumpapp(Stetho.defaultDumperPluginsProvider(this))
-                        .enableWebKitInspector(RealmInspectorModulesProvider.builder(this).build())
-                        .build());
+//        Stetho.initialize(
+//                Stetho.newInitializerBuilder(this)
+//                        .enableDumpapp(Stetho.defaultDumperPluginsProvider(this))
+//                        .enableWebKitInspector(RealmInspectorModulesProvider.builder(this).build())
+//                        .build());
         fileCopy();
 
     }
@@ -59,8 +57,8 @@ public class MyApplication extends Application {
         try {
             is = assetManager.open("pcbang.realm", AssetManager.ACCESS_BUFFER);
             long fileSize = is.available();
-//            if(true){
-            if (outfile.length() < fileSize) {
+            if(true){
+//            if (outfile.length() < fileSize) {
                 byte[] tempData = new byte[(int) fileSize];
                 is.read(tempData);
                 is.close();

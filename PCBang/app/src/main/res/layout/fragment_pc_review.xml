@@ -6,7 +6,9 @@
     android:name="com.ypunval.pcbang.PCReviewFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginLeft="16dp"
+    android:layout_marginRight="16dp"
     app:layoutManager="LinearLayoutManager"
     tools:context=".fragment.PCReviewFragment"
-    android:fillViewport="true"
+
     tools:listitem="@layout/item_pc_review" />

@@ -14,15 +14,14 @@ public abstract class BaseRealmActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         realm = Realm.getDefaultInstance();
         mPref = PreferenceManager.getDefaultSharedPreferences(this);
-        super.onCreate(savedInstanceState);
-
     }
 
     @Override
     protected void onDestroy() {
-        realm.close();
         super.onDestroy();
+        realm.close();
     }
 }

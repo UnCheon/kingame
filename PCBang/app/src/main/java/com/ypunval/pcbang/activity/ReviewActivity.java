@@ -4,9 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -15,29 +13,28 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.rey.material.widget.FrameLayout;
 import com.ypunval.pcbang.R;
 import com.ypunval.pcbang.listener.PCBangListenerInterface;
 import com.ypunval.pcbang.model.PCBang;
 import com.ypunval.pcbang.model.Sync;
 import com.ypunval.pcbang.update.JSONToRealm;
 import com.ypunval.pcbang.update.PCBangHttpHelper;
-import com.ypunval.pcbang.util.Constant;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.realm.Realm;
-import okhttp3.FormBody;
-import okhttp3.RequestBody;
 
-public class ReviewActivity extends BaseRealmActivity {
+public class ReviewActivity extends BaseActivity {
     @Bind(R.id.et_review)
     EditText et_review;
 
@@ -53,6 +50,9 @@ public class ReviewActivity extends BaseRealmActivity {
     @Bind(R.id.tv_rating_text)
     TextView tv_rating_text;
 
+    int pcBangId;
+    String last_updated;
+    String nickname;
 
     @OnClick(R.id.ll_et_review)
     public void edit_review(View v) {
@@ -67,8 +67,13 @@ public class ReviewActivity extends BaseRealmActivity {
         writeReview();
     }
 
-    private static final String TAG = "ReviewActivity";
+    private static final String TAG = "REVIEWACTIVITY";
 
+    public void onFinishWriteReview() {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(et_review.getWindowToken(), 0);
+        finish();
+    }
 
 
     @Override
@@ -77,18 +82,92 @@ public class ReviewActivity extends BaseRealmActivity {
         setContentView(R.layout.activity_review);
         ButterKnife.bind(this);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.colorPrimaryDark));
-        }
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        pcBangId = getIntent().getIntExtra("pcBangId", 0);
+        Realm realm = Realm.getDefaultInstance();
+        PCBang pcBang = realm.where(PCBang.class).equalTo("id", pcBangId).findFirst();
+        Sync sync = realm.where(Sync.class).equalTo("id", 1).findFirst();
+        last_updated = sync.getUpdated();
 
-        PCBang pcBang = realm.where(PCBang.class).equalTo("id", Constant.pcBangId).findFirst();
         setTitle(pcBang.getName());
+
+        SharedPreferences pref = getSharedPreferences("myInfo", MODE_PRIVATE);
+        nickname = pref.getString("nickname", "");
+        // TODO: 16. 5. 5. 닉네임 서버 만들어지면 if절 확인
+        if (false) {
+//        if (nickname == "") {
+            final PCBangListenerInterface.OnNicknameListener listener = new PCBangListenerInterface.OnNicknameListener() {
+                @Override
+                public void onSuccessNickname(String responseString) {
+                    JSONToRealm jsonToRealm = new JSONToRealm(ReviewActivity.this);
+                    String status = jsonToRealm.nicknameResultToRealm(responseString);
+                    if (status.equals("success")) {
+                        SharedPreferences pref = ReviewActivity.this.getSharedPreferences("myInfo", ReviewActivity.this.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = pref.edit();
+                        editor.putString("nickname", nickname);
+                    }
+                }
+
+                @Override
+                public void onFailureNetwork() {
+
+                }
+            };
+
+
+            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+            final EditText et_nickname = new EditText(this);
+
+            dialog.setView(et_nickname);
+
+
+            dialog.setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    nickname = et_nickname.getText().toString();
+                    Log.i(TAG, "onClick: " + nickname);
+                    SharedPreferences pref = ReviewActivity.this.getSharedPreferences("myInfo", ReviewActivity.this.MODE_PRIVATE);
+                    String phoneNumber = pref.getString("phoneNumber", "");
+                    String regId = pref.getString("regId", "");
+
+                    try {
+                        JSONObject jsonObject = new JSONObject();
+                        jsonObject.put("phoneNumber", phoneNumber);
+                        jsonObject.put("nickname", nickname);
+                        jsonObject.put("regId", regId);
+
+                        PCBangHttpHelper httpHelper = new PCBangHttpHelper();
+                        httpHelper.nickname(jsonObject, listener);
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            });
+
+            dialog.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                    ReviewActivity.this.finish();
+                }
+            });
+
+            dialog.setMessage("사용하실 닉네임을 입력하세요.");
+            dialog.setCancelable(false);
+            dialog.show();
+
+            FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(20, FrameLayout.LayoutParams.WRAP_CONTENT);
+            lp.setMargins(10, 0, 10, 0);
+            et_nickname.setLayoutParams(lp);
+
+        }
 
 
         et_review.addTextChangedListener(new TextWatcher() {
@@ -141,76 +220,85 @@ public class ReviewActivity extends BaseRealmActivity {
     }
 
     private void writeReview() {
-        PCBangListenerInterface.OnPostFinishListener listener = new PCBangListenerInterface.OnPostFinishListener() {
-            @Override
-            public void onPostSuccess(String responseString) {
-                ReviewActivity.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        ReviewActivity.this.dismissReviewDialog();
-                    }
-                });
-
-                Log.i(TAG, "onPostSuccess");
-
-                JSONToRealm jsonToRealm = new JSONToRealm(ReviewActivity.this);
-                String status = jsonToRealm.updateResultToRealm(responseString);
-
-                if (status.equals("success")) {
-
-                } else if (status.equals("empty")) {
-
-                } else if (status.equals("fail")) {
-
-                }
-
-                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(et_review.getWindowToken(), 0);
-
-                ReviewActivity.this.setResult(RESULT_OK, getIntent());
-                finish();
-
-            }
-
-            @Override
-            public void onPostFailure() {
-                ReviewActivity.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        ReviewActivity.this.dismissReviewDialog();
-                    }
-                });
-
-                Log.i(TAG, "onFailureNetwork");
-//            Todo: network fail 처리
-            }
-        };
-
-
         SharedPreferences pref = ReviewActivity.this.getSharedPreferences("myInfo", ReviewActivity.this.MODE_PRIVATE);
-        String phoneNumber = pref.getString("phoneNumber", "010");
+        String nickname = pref.getString("nickname", "");
+        String phoneNumber = pref.getString("phoneNumber", "");
+        String regId = pref.getString("regId", "");
 
         String content = et_review.getText().toString();
         float rate = 2 * (ratingBar.getRating());
+        Realm realm = Realm.getDefaultInstance();
         Sync sync = realm.where(Sync.class).equalTo("id", 1).findFirst();
         String last_updated = sync.getUpdated();
 
-        Log.i(TAG, "writeReview: last_updated : " + last_updated);
+//        if (nickname != "" && phoneNumber != "" && content != "" && pcBangId != 0){
+        // TODO: 16. 5. 5. 리뷰작성시 if절 확인 (닉네임 저장된후)
+        if (true) {
 
-        // TODO: 2016. 5. 20. last updated 가짜 데이터 진짜로 바꾸기
+            PCBangListenerInterface.OnUpdateListener listener = new PCBangListenerInterface.OnUpdateListener() {
+                @Override
+                public void onSuccessUpdate(String responseString) {
+                    ReviewActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ReviewActivity.this.dismissReviewDialog();
+                        }
+                    });
+                    Log.i(TAG, "onSuccessUpdate");
+                    JSONToRealm jsonToRealm = new JSONToRealm(ReviewActivity.this);
+                    String status = jsonToRealm.updateResultToRealm(responseString);
+                    if (status.equals("success")){
+                        ReviewActivity.this.finish();
 
-        RequestBody formBody = new FormBody.Builder()
-                .add("pcbang", Constant.pcBangId+"")
-                .add("last_updated", sync.getUpdated())
-                .add("content", content)
-                .add("rate", rate+"")
-                .add("phone_number", phoneNumber)
-                .build();
+                    }else if (status.equals("empty")){
+
+                    }else if (status.equals("fail")){
+
+                    }
+                }
+
+                @Override
+                public void onFailureNetwork() {
+                    ReviewActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ReviewActivity.this.dismissReviewDialog();
+                        }
+                    });
+                    Log.i(TAG, "onFailureNetwork");
+//            Todo: network fail 처리
+                }
+            };
 
 
-        PCBangHttpHelper pcBangHttpHelper = new PCBangHttpHelper();
-        pcBangHttpHelper.post(formBody, getResources().getString(R.string.url_review_write), listener);
 
+
+            JSONObject jsonObject = new JSONObject();
+            JSONObject jsonReview = new JSONObject();
+            try {
+                // TODO: 16. 5. 5. 닉네임값 넣어주기
+                jsonReview.put("nickname", "유소니");
+                jsonReview.put("phoneNumber", phoneNumber);
+                jsonReview.put("pcbang", regId);
+                jsonReview.put("content", content);
+                jsonReview.put("pcbang", pcBangId);
+                jsonReview.put("rate", rate);
+
+                jsonObject.put("last_updated", last_updated);
+                jsonObject.put("review", jsonReview);
+                ReviewActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ReviewActivity.this.showReviewDialog();
+                    }
+                });
+
+                PCBangHttpHelper httpHelper = new PCBangHttpHelper();
+                httpHelper.update_or_writeReview(jsonObject, listener);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 

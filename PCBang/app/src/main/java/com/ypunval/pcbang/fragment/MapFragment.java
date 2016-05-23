@@ -207,7 +207,7 @@ public class MapFragment extends BaseRealmFragment implements ClusterManager.OnC
                     mClusterManager.clearItems();
                     if (pcBangs != null) {
                         for (PCBang pcBang : pcBangs) {
-                            PCBangClusterItem item = new PCBangClusterItem();
+                            PCBangClusterItem item = new PCBangClusterItem(pcBang);
                             mClusterManager.addItem(item);
                         }
                     }

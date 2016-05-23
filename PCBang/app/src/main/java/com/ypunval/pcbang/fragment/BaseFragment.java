@@ -11,6 +11,7 @@ public class BaseFragment extends Fragment {
     private static final String FLURRY_KEY = "G869MPMXFV6NB74JSSDJ";
 
 
+
     @Override
     public void onResume() {
         super.onResume();

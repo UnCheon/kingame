@@ -15,18 +15,16 @@ public class BaseRealmFragment extends BaseFragment {
 
     @Override
     public void onStart() {
+        super.onStart();
         realm = Realm.getDefaultInstance();
         mPref = PreferenceManager.getDefaultSharedPreferences(getContext());
-        super.onStart();
-
 
 
     }
 
     @Override
     public void onStop() {
-        realm.close();
         super.onStop();
-
+        realm.close();
     }
 }

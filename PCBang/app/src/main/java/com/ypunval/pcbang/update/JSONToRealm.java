@@ -32,11 +32,55 @@ public class JSONToRealm {
         this.context = context;
     }
 
+    public String registerResultToRealm(String responseString) {
+        String status = "fail";
+        responseString = responseString.replace("\\\"", "\"");
+        responseString = responseString.replace("\\\\", "\\");
+        int length = responseString.length();
+        responseString = responseString.substring(1, length - 1);
+
+        Log.i(TAG, "register response : " + responseString);
+
+        try {
+            JSONObject responseObj = new JSONObject(responseString);
+            status = responseObj.getString("status");
+
+        } catch (JSONException e) {
+            status = "fail";
+            e.printStackTrace();
+        }
+        return status;
+    }
+
+    public String nicknameResultToRealm(String responseString) {
+        String status = "fail";
+        responseString = responseString.replace("\\\"", "\"");
+        responseString = responseString.replace("\\\\", "\\");
+        int length = responseString.length();
+        responseString = responseString.substring(1, length - 1);
+
+        Log.i(TAG, "nickname response : " + responseString);
+
+        try {
+            JSONObject responseObj = new JSONObject(responseString);
+            status = responseObj.getString("status");
+
+        } catch (JSONException e) {
+            status = "fail";
+            e.printStackTrace();
+        }
+        return status;
+    }
 
     public String updateResultToRealm(String responseString) {
         Realm realm = Realm.getDefaultInstance();
 
         String status = "fail";
+        responseString = responseString.replace("\\\"", "\"");
+        responseString = responseString.replace("\\\\", "\\");
+        int length = responseString.length();
+        responseString = responseString.substring(1, length - 1);
+
         Log.i(TAG, "update response : " + responseString);
 
 
@@ -55,29 +99,28 @@ public class JSONToRealm {
 
                 ArrayList<PCBang> pcBangs = new ArrayList<>();
                 for (int i = 0; i < pcBang_list.length(); i++) {
-                    JSONObject jsonObject = (JSONObject) pcBang_list.get(i);
-                    JSONObject obj = jsonObject.getJSONObject("fields");
+                    JSONObject obj = (JSONObject) pcBang_list.get(i);
                     PCBang pcBang = new PCBang();
-                    pcBang.setId(jsonObject.getInt("pk"));
+                    pcBang.setId(obj.getInt("id"));
                     pcBang.setTotalSeat(obj.getInt("total_seat"));
 
                     pcBang.setSeat(obj.getString("seat"));
                     pcBang.setCafeNo(obj.getInt("cafe_no"));
                     pcBang.setComputer(obj.getString("computer"));
                     boolean exist;
-//                    if (obj.getBoolean("exist") == 0)
-//                        exist = false;
-//                    else
-//                        exist = true;
+                    if (obj.getInt("exist") == 0)
+                        exist = false;
+                    else
+                        exist = true;
 
-                    pcBang.setExist(obj.getBoolean("exist"));
-                    pcBang.setImages(obj.getString("images"));
-                    pcBang.setImageMain(obj.getString("imageMain"));
-                    pcBang.setImageThumb(obj.getString("imageThumb"));
+                    pcBang.setExist(exist);
+                    pcBang.setImages("images");
+                    pcBang.setImageMain("imageMain");
+                    pcBang.setImageThumb("imageThumb");
                     pcBang.setReviewCount(obj.getInt("review_count"));
                     pcBang.setMinPrice(obj.getInt("min_price"));
                     pcBang.setLatitude((float) obj.getDouble("latitude"));
-                    pcBang.setPhoneNumber(obj.getString("latitude"));
+                    pcBang.setPhoneNumber(obj.getString("phone_number"));
                     pcBang.setUpdated(obj.getString("updated"));
                     pcBang.setAddress1(obj.getString("address1"));
                     pcBang.setPrice(obj.getString("price"));
@@ -92,16 +135,16 @@ public class JSONToRealm {
                     pcBang.setLongitude((float) obj.getDouble("longitude"));
                     pcBang.setAllied(obj.getString("allied"));
 
-                    int doe_id = obj.getInt("doe");
-                    int si_id = obj.getInt("si");
-                    int dong_id = obj.getInt("dong");
+                    int doe_id = obj.getInt("doe_id");
+                    int si_id = obj.getInt("si_id");
+                    int dong_id = obj.getInt("dong_id");
 
                     Doe doe = realm.where(Doe.class).equalTo("id", doe_id).findFirst();
                     Si si = realm.where(Si.class).equalTo("id", si_id).findFirst();
                     Dong dong = realm.where(Dong.class).equalTo("id", dong_id).findFirst();
 
 
-                    if (obj.getBoolean("exist"))
+                    if (exist)
                         si.setPcBangCount(si.getPcBangCount() + 1);
                     else
                         si.setPcBangCount(si.getPcBangCount() - 1);
@@ -109,8 +152,8 @@ public class JSONToRealm {
                     JSONArray ja_subways = obj.getJSONArray("subway");
                     RealmList<Subway> subways = new RealmList<Subway>();
                     for (int j = 0 ; j < ja_subways.length() ; j++){
-                        Subway subway = realm.where(Subway.class).equalTo("id", ja_subways.getInt(j)).findFirst();
-                        if (obj.getBoolean("exist"))
+                        Subway subway = realm.where(Subway.class).equalTo("id", (int)ja_subways.get(j)).findFirst();
+                        if (exist)
                             subway.setPcBangCount(subway.getPcBangCount() + 1);
                         else
                             subway.setPcBangCount(subway.getPcBangCount() - 1);
@@ -120,7 +163,7 @@ public class JSONToRealm {
                     JSONArray ja_conveniences = obj.getJSONArray("convenience");
                     RealmList<Convenience> conveniences = new RealmList<Convenience>();
                     for (int j = 0 ; j < ja_conveniences.length() ; j++){
-                        Convenience convenience = realm.where(Convenience.class).equalTo("id", ja_conveniences.getInt(j)).findFirst();
+                        Convenience convenience = realm.where(Convenience.class).equalTo("id", (int)ja_conveniences.get(j)).findFirst();
                         conveniences.add(convenience);
                     }
 
@@ -133,18 +176,16 @@ public class JSONToRealm {
 
                 ArrayList<Review> reviews = new ArrayList<>();
                 for (int i = 0; i < review_list.length(); i++) {
-
-                    JSONObject jsonObject = review_list.getJSONObject(i);
-                    JSONObject obj = jsonObject.getJSONObject("fields");
+                    JSONObject obj = review_list.getJSONObject(i);
 
                     Review review = new Review();
                     review.setCreated(obj.getString("created"));
                     review.setContent(obj.getString("content"));
                     review.setRate((float) obj.getDouble("rate"));
-                    review.setPhoneNumber(obj.getString("phone_number"));
+                    review.setPhoneNumber(obj.getString("phoneNumber"));
                     int pcBang_id = obj.getInt("pcbang");
                     review.setNickname(obj.getString("nickname"));
-                    review.setId(jsonObject.getInt("pk"));
+                    review.setId(obj.getInt("id"));
 
                     PCBang pcBang = realm.where(PCBang.class).equalTo("id", pcBang_id).findFirst();
                     review.setPcBang(pcBang);
@@ -152,14 +193,16 @@ public class JSONToRealm {
                     reviews.add(review);
                 }
 
+
                 Sync sync = realm.where(Sync.class).equalTo("id", 1).findFirst();
+                sync.setPcBangCount(sync_obj.getInt("pcbang_count"));
                 sync.setS3(sync_obj.getString("s3_url"));
-                sync.setUpdated(sync_obj.getString("last_updated"));
-                sync.setPeriod(sync_obj.getInt("period"));
+                sync.setUpdated(sync_obj.getString("updated"));
                 sync.setLastRequsetTime(System.currentTimeMillis());
 
                 realm.copyToRealmOrUpdate(pcBangs);
                 realm.copyToRealmOrUpdate(reviews);
+
 
                 realm.commitTransaction();
 
@@ -183,4 +226,9 @@ public class JSONToRealm {
 
         return status;
     }
+
+
+
+
+
 }

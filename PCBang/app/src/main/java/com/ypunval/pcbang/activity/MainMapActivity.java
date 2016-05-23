@@ -1,23 +1,17 @@
 package com.ypunval.pcbang.activity;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
-import android.opengl.Visibility;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.speech.RecognizerIntent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomSheetBehavior;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
@@ -32,27 +26,19 @@ import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.text.TextUtils;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Display;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.daimajia.slider.library.Indicators.PagerIndicator;
-import com.daimajia.slider.library.SliderLayout;
-import com.daimajia.slider.library.SliderTypes.BaseSliderView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -75,63 +61,42 @@ import com.lapism.searchview.adapter.SearchItem;
 import com.lapism.searchview.history.SearchHistoryTable;
 import com.lapism.searchview.view.SearchCodes;
 import com.lapism.searchview.view.SearchView;
+import com.rey.material.widget.FrameLayout;
 import com.ypunval.pcbang.R;
-import com.ypunval.pcbang.fragment.BaseFragment;
 import com.ypunval.pcbang.fragment.PCBasicFragment;
 import com.ypunval.pcbang.fragment.PCMapFragment;
 import com.ypunval.pcbang.fragment.PCPriceFragment;
 import com.ypunval.pcbang.fragment.PCReviewFragment;
-import com.ypunval.pcbang.listener.PCBangListenerInterface;
 import com.ypunval.pcbang.model.Convenience;
-import com.ypunval.pcbang.model.Dong;
 import com.ypunval.pcbang.model.PCBang;
-import com.ypunval.pcbang.model.Si;
-import com.ypunval.pcbang.model.Subway;
-import com.ypunval.pcbang.model.Sync;
-import com.ypunval.pcbang.update.JSONToRealm;
-import com.ypunval.pcbang.update.PCBangHttpHelper;
 import com.ypunval.pcbang.util.Constant;
 import com.ypunval.pcbang.util.CustomBottomSheetBehavior;
 import com.ypunval.pcbang.util.CustomSearchView;
 import com.ypunval.pcbang.util.PCBangClusterItem;
 import com.ypunval.pcbang.util.PCBangRenderer;
-import com.ypunval.pcbang.util.SliderPCBangInfoView;
 import com.ypunval.pcbang.util.Util;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import io.realm.Realm;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
-import okhttp3.FormBody;
-import okhttp3.RequestBody;
 
-public class MainMapActivity extends BaseRealmActivity implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, ClusterManager.OnClusterClickListener<PCBangClusterItem>,
+public class MainMapActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, ClusterManager.OnClusterClickListener<PCBangClusterItem>,
         ClusterManager.OnClusterInfoWindowClickListener<PCBangClusterItem>, ClusterManager.OnClusterItemClickListener<PCBangClusterItem>,
         ClusterManager.OnClusterItemInfoWindowClickListener<PCBangClusterItem>, GoogleMap.OnMapClickListener,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
-
 
     @Bind(R.id.drawer_layout)
     DrawerLayout drawer;
 
     @Bind(R.id.nav_view)
     NavigationView navigationView;
-
-    @Bind(R.id.fl_slider)
-    FrameLayout fl_slider;
-    @Bind(R.id.slider)
-    SliderLayout slider;
-    @Bind(R.id.custom_indicator)
-    PagerIndicator indicator;
-
     @Bind(R.id.searchView)
     CustomSearchView searchView;
 
@@ -148,22 +113,17 @@ public class MainMapActivity extends BaseRealmActivity implements NavigationView
     TextView tv_condition;
 
     private static final String TAG = MainMapActivity.class.getName();
-    static final int SPLASH_REQUEST_CODE = 1234;
-    static final int WRITE_REVIEW_CODE = 22;
-    private final long FINISH_INTERVAL_TIME = 2000;
-
-    private long backPressedTime = 0;
 
     //    Google Map
     MapFragment mapFragment;
     private GoogleMap googleMap;
-    private static final int ZOOM = 16;
+    private static final int ZOOM = 14;
     GoogleApiClient googleApiClient;
     LocationRequest locationRequest = createLocationRequest();
     int pcBangId = 1;
     int resultCount = 0;
     boolean isFirst = true;
-    int range = 3;
+    int range = 10;
     private ClusterManager<PCBangClusterItem> mClusterManager;
     private PCBangRenderer pcBangRenderer;
     Marker mSelectedMarker = null;
@@ -171,16 +131,8 @@ public class MainMapActivity extends BaseRealmActivity implements NavigationView
     float lat = 0;
     float lon = 0;
     private InfoPagerAdapter infoPagerAdapter;
+    RealmResults<PCBang> pcBangs;
     CustomBottomSheetBehavior customBottomSheetBehavior;
-
-    //  Bottom Sheet State
-    int preBottomSheetState = BottomSheetBehavior.STATE_HIDDEN;
-    float preSlideOffset = -1;
-    int preVpInfoPosition = 0;
-    boolean isAnimating = false;
-    int selectedPCBangId = 1;
-
-
 
     //    search view
     int checkedMenuItem = 0;
@@ -189,6 +141,11 @@ public class MainMapActivity extends BaseRealmActivity implements NavigationView
     private int mVersion = SearchCodes.VERSION_TOOLBAR;
     private int mStyle = SearchCodes.STYLE_TOOLBAR_CLASSIC;
     private int mTheme = SearchCodes.THEME_LIGHT;
+
+    //    Realm & SharedPreperence
+    Realm realm;
+    SharedPreferences mPref;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -201,176 +158,34 @@ public class MainMapActivity extends BaseRealmActivity implements NavigationView
         ButterKnife.bind(this);
 
 
-
         setSearchView();
-
-
         setInfoView();
         googleApiClient = getLocationApiClient();
 
-        setSlider();
-        // TODO: 2016. 5. 20. 업데이트하기 주석 제거
-
-//        update();
-
-
     }
 
-    public void setCanBottomSheetScroll(boolean can) {
+    public void setCanBottomSheetScroll(boolean can){
         customBottomSheetBehavior.setCanScroll(can);
     }
 
 
-    private void setInfoView() {
+    private void setInfoView(){
         customBottomSheetBehavior = (CustomBottomSheetBehavior) BottomSheetBehavior.from(ll_pcBang_info);
         customBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-
         infoPagerAdapter = new InfoPagerAdapter(getSupportFragmentManager());
-        infoPagerAdapter.addFrag(new PCBasicFragment(), "기본정보");
-        infoPagerAdapter.addFrag(new PCPriceFragment(), "요금정보");
-        infoPagerAdapter.addFrag(new PCReviewFragment(), "후기");
         vpInfo.setAdapter(infoPagerAdapter);
         infoTabLayout.setupWithViewPager(vpInfo);
-
-        vpInfo.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                Log.i(TAG, "onPageSelected: "+position);
-//                if (preVpInfoPosition == 2 && customBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
-//                    setCanBottomSheetScroll(true);
-//                }
-//                preVpInfoPosition = position;
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-                Log.i(TAG, "onPageScrollStateChanged: "+state);
-            }
-        });
-
-
-        customBottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
-            @Override
-            public void onStateChanged(@NonNull View bottomSheet, int newState) {
-                switch (newState) {
-                    case BottomSheetBehavior.STATE_COLLAPSED:
-                        if (preBottomSheetState == BottomSheetBehavior.STATE_HIDDEN)
-//                            setPCBangData();
-                        Log.i(TAG, "onStateChanged: collapsed");
-                        break;
-                    case BottomSheetBehavior.STATE_EXPANDED:
-                        Log.i(TAG, "onStateChanged: expanded");
-                        break;
-                    case BottomSheetBehavior.STATE_DRAGGING:
-                        if (preBottomSheetState == BottomSheetBehavior.STATE_EXPANDED)
-                            animateSlider(false);
-                        Log.i(TAG, "onStateChanged: dragging");
-                        break;
-                    case BottomSheetBehavior.STATE_HIDDEN:
-                        Log.i(TAG, "onStateChanged: hidden");
-                        break;
-                }
-
-                preBottomSheetState = newState;
-            }
-
-            @Override
-            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-                if (slideOffset > 0 && slideOffset < 1) {
-                    if (slideOffset > preSlideOffset) {
-                        animateSlider(true);
-                    }else{
-                        animateSlider(false);
-                    }
-
-
-                    preSlideOffset = slideOffset;
-
-
-                }
-            }
-        });
-
-    }
-
-    private void animateSlider(boolean isShowUp) {
-        if (isShowUp) {
-            if (fl_slider.getVisibility() == View.VISIBLE)
-                return;
-
-            Animation animation = AnimationUtils.loadAnimation(this, R.anim.anim_slider_appear);
-            animation.setAnimationListener(new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(Animation animation) {
-
-                }
-
-                @Override
-                public void onAnimationEnd(Animation animation) {
-
-                }
-
-                @Override
-                public void onAnimationRepeat(Animation animation) {
-
-                }
-            });
-            fl_slider.startAnimation(animation);
-            fl_slider.setVisibility(View.VISIBLE);
-            isAnimating = false;
-
-        } else {
-            if (isAnimating)
-                return;
-
-            Animation animation = AnimationUtils.loadAnimation(this, R.anim.anim_slider_disappear);
-            animation.setAnimationListener(new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(Animation animation) {
-                    isAnimating = true;
-                }
-
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    fl_slider.setVisibility(View.GONE);
-                    isAnimating =false;
-                }
-
-                @Override
-                public void onAnimationRepeat(Animation animation) {
-
-                }
-            });
-            fl_slider.startAnimation(animation);
-
-        }
     }
 
 
     @Override
     public void onBackPressed() {
-        Log.i(TAG, "onBackPressed: "+searchView.isSearchOpen()+"");
         if (drawer != null && drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else if (searchView != null && searchView.isSearchOpen()) {
             searchView.hide(true);
-        } else if (ll_pcBang_info != null && customBottomSheetBehavior.getState() != BottomSheetBehavior.STATE_HIDDEN) {
-            customBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         } else {
-
-            long tempTime = System.currentTimeMillis();
-            long intervalTime = tempTime - backPressedTime;
-
-            if (0 <= intervalTime && FINISH_INTERVAL_TIME >= intervalTime && backPressedTime > 0) {
-                super.onBackPressed();
-            } else {
-                backPressedTime = tempTime;
-                Toast.makeText(getApplicationContext(), "'뒤로'버튼을한번더누르시면종료됩니다.", Toast.LENGTH_SHORT).show();
-            }
+            super.onBackPressed();
         }
     }
 
@@ -438,7 +253,7 @@ public class MainMapActivity extends BaseRealmActivity implements NavigationView
             @Override
             public boolean onQueryTextSubmit(String query) {
                 mHistoryDatabase.addItem(new SearchItem(query));
-                searchPlace(query);
+                Toast.makeText(getApplicationContext(), query, Toast.LENGTH_SHORT).show();
                 return false;
             }
 
@@ -465,116 +280,17 @@ public class MainMapActivity extends BaseRealmActivity implements NavigationView
                 TextView textView = (TextView) view.findViewById(R.id.textView_item_text);
                 CharSequence text = textView.getText();
                 mHistoryDatabase.addItem(new SearchItem(text));
-                searchPlace(text.toString());
+                Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT).show();
             }
         });
-        mSuggestionsList.clear();
-        mSuggestionsList.addAll(mHistoryDatabase.getAllItems());
-        searchView.setAdapter(mSearchAdapter);
 
+        searchView.setAdapter(mSearchAdapter);
+        showSearchView();
         CardView cardView = searchView.getCardView();
         FrameLayout.LayoutParams cvParams = (FrameLayout.LayoutParams) cardView.getLayoutParams();
         cvParams.topMargin += getStatusBarHeight();
         cardView.setLayoutParams(cvParams);
-
-        searchView.hide(false);
-
     }
-
-    private void searchPlace(String query) {
-        float lat_search = 0;
-        float lon_search = 0;
-        Dong dong = null;
-        Subway subway = null;
-        Si si = null;
-        int count = 0;
-        while (count < 5) {
-            switch (count) {
-                case 0:
-                    dong = realm.where(Dong.class).equalTo("name", query).findFirst();
-                    break;
-                case 1:
-                    dong = realm.where(Dong.class).equalTo("name", query + "동").findFirst();
-                    break;
-                case 2:
-                    dong = realm.where(Dong.class).equalTo("name", query + "읍").findFirst();
-                    break;
-                case 3:
-                    dong = realm.where(Dong.class).equalTo("name", query + "면").findFirst();
-                    break;
-                case 4:
-                    dong = realm.where(Dong.class).equalTo("name", query + "리").findFirst();
-            }
-
-            if (dong != null) {
-                lat_search = dong.getLatitude();
-                lon_search = dong.getLongitude();
-                break;
-            }
-
-            count++;
-
-        }
-
-        if (dong == null) {
-            count = 0;
-            while (count < 2) {
-                switch (count) {
-                    case 0:
-                        subway = realm.where(Subway.class).equalTo("name", query).findFirst();
-                        break;
-                    case 1:
-                        subway = realm.where(Subway.class).equalTo("name", query + "역").findFirst();
-                        break;
-
-                }
-
-                if (subway != null) {
-                    lat_search = subway.getLatitude();
-                    lon_search = subway.getLongitude();
-                    break;
-                }
-
-                count++;
-            }
-        }
-
-
-        if (dong == null && subway == null) {
-            count = 0;
-            while (count < 3) {
-                switch (count) {
-                    case 0:
-                        si = realm.where(Si.class).equalTo("name", query).findFirst();
-                        break;
-                    case 1:
-                        si = realm.where(Si.class).equalTo("name", query + "구").findFirst();
-                        break;
-                    case 2:
-                        si = realm.where(Si.class).equalTo("name", query + "시").findFirst();
-                        break;
-                }
-
-                if (si != null) {
-                    lat_search = si.getLatitude();
-                    lon_search = si.getLongitude();
-                    break;
-                }
-
-                count++;
-            }
-        }
-
-        if (lat_search == 0 || lon_search == 0) {
-            Toast.makeText(getApplicationContext(), "\"" + query + "\"" + " 로 검색된 결과가 없습니다.", Toast.LENGTH_SHORT).show();
-
-        } else {
-            CameraPosition cameraPosition = new CameraPosition.Builder().target(new LatLng(lat_search, lon_search)).zoom(ZOOM).build();
-            googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 300, null);
-            searchView.hide(true);
-        }
-    }
-
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -605,10 +321,22 @@ public class MainMapActivity extends BaseRealmActivity implements NavigationView
         if (checkedMenuItem > -1) {
             navigationView.getMenu().getItem(checkedMenuItem).setChecked(true);
         }
+
     }
+
+
+    private void showSearchView() {
+        mSuggestionsList.clear();
+        mSuggestionsList.addAll(mHistoryDatabase.getAllItems());
+        mSuggestionsList.add(new SearchItem("Google"));
+        mSuggestionsList.add(new SearchItem("Android"));
+    }
+
 
     @Override
     protected void onStart() {
+        realm = Realm.getDefaultInstance();
+        mPref = PreferenceManager.getDefaultSharedPreferences(this);
         googleApiClient.connect();
         initCategory();
         super.onStart();
@@ -617,6 +345,7 @@ public class MainMapActivity extends BaseRealmActivity implements NavigationView
     @Override
     protected void onStop() {
         Log.i(TAG, "onStop: called");
+        realm.close();
         googleApiClient.disconnect();
         super.onStop();
     }
@@ -624,7 +353,6 @@ public class MainMapActivity extends BaseRealmActivity implements NavigationView
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.i(TAG, "onActivityResult: ");
         if (requestCode == SearchView.SPEECH_REQUEST_CODE && resultCode == RESULT_OK) {
             List<String> results = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
             if (results != null && results.size() > 0) {
@@ -634,79 +362,7 @@ public class MainMapActivity extends BaseRealmActivity implements NavigationView
                 }
             }
         }
-
-        if (requestCode == PCReviewFragment.WRITE_REVIEW_CODE && resultCode == RESULT_OK) {
-
-        }
-
-        if (requestCode == SPLASH_REQUEST_CODE && resultCode == RESULT_OK) {
-
-        }
-
         super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    private void update() {
-
-        Sync sync = realm.where(Sync.class).equalTo("id", 1).findFirst();
-        int period = sync.getPeriod();
-        long timeDifference = System.currentTimeMillis() - sync.getLastRequsetTime();
-
-        Log.i(TAG, "update: "+sync.getUpdated());
-
-        if (timeDifference < period * 360000) {
-            Log.i(TAG, "update: 아직 업데이트할만큼 시간이 안됐음 - " + timeDifference);
-            return;
-        }
-
-
-        PCBangListenerInterface.OnPostFinishListener listener = new PCBangListenerInterface.OnPostFinishListener() {
-            @Override
-            public void onPostSuccess(String responseString) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        dismissUpdateDialog();
-                    }
-                });
-                Log.i(TAG, "onPostSuccess");
-                JSONToRealm jsonToRealm = new JSONToRealm(MainMapActivity.this);
-                String status = jsonToRealm.updateResultToRealm(responseString);
-                if (status.equals("success")) {
-
-                } else if (status.equals("empty")) {
-
-                } else if (status.equals("fail")) {
-
-                }
-            }
-
-            @Override
-            public void onPostFailure() {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        dismissUpdateDialog();
-                    }
-                });
-                Log.i(TAG, "onPostFailure");
-//            Todo: network fail 처리
-            }
-        };
-
-
-        RequestBody formBody = new FormBody.Builder()
-                .add("last_updated", sync.getUpdated())
-                .build();
-
-        PCBangHttpHelper pcBangHttpHelper = new PCBangHttpHelper();
-        pcBangHttpHelper.post(formBody, getResources().getString(R.string.url_pcbang_update), listener);
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                showUpdateDialog();
-            }
-        });
     }
 
 
@@ -716,6 +372,7 @@ public class MainMapActivity extends BaseRealmActivity implements NavigationView
         if (resourceId > 0) {
             result = getResources().getDimensionPixelSize(resourceId);
         }
+        Log.i(TAG, "getStatusBarHeight: " + result);
         return result;
     }
 
@@ -763,7 +420,7 @@ public class MainMapActivity extends BaseRealmActivity implements NavigationView
         RelativeLayout.LayoutParams locationParams = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
         RelativeLayout.LayoutParams newLocationParams = new RelativeLayout.LayoutParams(locationParams.width, locationParams.height);
         newLocationParams.rightMargin = locationParams.rightMargin;
-        newLocationParams.topMargin = (int) getResources().getDimension(R.dimen.my_location_top_margin);
+        newLocationParams.topMargin = (int)getResources().getDimension(R.dimen.my_location_top_margin);
         newLocationParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
         newLocationParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
 
@@ -790,19 +447,19 @@ public class MainMapActivity extends BaseRealmActivity implements NavigationView
                 if (Math.abs(cameraPosition.zoom - pastZoom) >= 1) {
                     pastZoom = cameraPosition.zoom;
                 } else {
-//                    if (cameraPosition.zoom > 12) {
-                    float dist = Util.calDistance(pastLatlng.latitude, pastLatlng.longitude, cameraPosition.target.latitude, cameraPosition.target.longitude);
-                    Log.i(TAG, "onCameraChange: dist : " + dist);
-                    if (dist > 3) {
+                    if (cameraPosition.zoom > 12) {
+                        float dist = Util.calDistance(pastLatlng.latitude, pastLatlng.longitude, cameraPosition.target.latitude, cameraPosition.target.longitude);
+                        Log.i(TAG, "onCameraChange: dist : " + dist);
+                        if (dist > 5) {
 
-                        lat = (float) cameraPosition.target.latitude;
-                        lon = (float) cameraPosition.target.longitude;
-                        Log.i(TAG, "onCameraChange: start get data");
-                        getData();
-                        pastLatlng = cameraPosition.target;
+                            lat = (float) cameraPosition.target.latitude;
+                            lon = (float) cameraPosition.target.longitude;
+                            Log.i(TAG, "onCameraChange: start get data");
+                            getData();
+                            pastLatlng = cameraPosition.target;
 
-//                        }
-//                    } else {
+                        }
+                    } else {
 
                     }
                 }
@@ -822,7 +479,7 @@ public class MainMapActivity extends BaseRealmActivity implements NavigationView
         mClusterManager.setOnClusterItemClickListener(this);
         mClusterManager.setOnClusterItemInfoWindowClickListener(this);
 
-//        mClusterManager.cluster();
+        mClusterManager.cluster();
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -839,43 +496,40 @@ public class MainMapActivity extends BaseRealmActivity implements NavigationView
 
     private void getData() {
         if (lat != 0 && lon != 0) {
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    Log.i(TAG, "execute: " + System.currentTimeMillis());
+                    RealmQuery<PCBang> query = realm.where(PCBang.class).equalTo("exist", true);
+                    float lat_small = lat - Constant.LATITUDE_CONSTANT * range;
+                    float lat_big = lat + Constant.LATITUDE_CONSTANT * range;
 
-            realm.beginTransaction();
-            mClusterManager.clearItems();
+                    float lon_small = lon - Constant.LONGITUDE_CONSTANT * range;
+                    float lon_big = lon + Constant.LONGITUDE_CONSTANT * range;
+                    pcBangs = query.between("latitude", lat_small, lat_big)
+                            .between("longitude", lon_small, lon_big).findAll();
 
-            RealmQuery<PCBang> query = realm.where(PCBang.class).equalTo("exist", true);
-            float lat_small = lat - Constant.LATITUDE_CONSTANT * range;
-            float lat_big = lat + Constant.LATITUDE_CONSTANT * range;
+                    resultCount = pcBangs.size();
 
-            float lon_small = lon - Constant.LONGITUDE_CONSTANT * range;
-            float lon_big = lon + Constant.LONGITUDE_CONSTANT * range;
+                    mClusterManager.clearItems();
+                    if (pcBangs != null) {
+                        for (PCBang pcBang : pcBangs) {
+                            PCBangClusterItem item = new PCBangClusterItem(pcBang);
+                            mClusterManager.addItem(item);
+                        }
+                    }
 
-            query.between("latitude", lat_small, lat_big).between("longitude", lon_small, lon_big);
-
-            for (Convenience convenience : Constant.conveniences) {
-                if (convenience.isSelected())
-                    query.equalTo("convenience.id", convenience.getId());
-            }
-
-            RealmResults<PCBang> pcBangs = query.findAll();
-
-            Log.i(TAG, "execute: pcbang count = " + pcBangs.size());
-
-            if (pcBangs != null) {
-                for (PCBang pcBang : pcBangs) {
-                    PCBangClusterItem item = new PCBangClusterItem();
-                    item.setLatLng(new LatLng(pcBang.getLatitude(), pcBang.getLongitude()));
-                    item.setId(pcBang.getId());
-                    item.setPcBangName(pcBang.getName());
-                    item.setAllianceLevel(pcBang.getAllianceLevel());
-                    item.setMinPrice(pcBang.getMinPrice());
-                    mClusterManager.addItem(item);
                 }
-            }
+            }, new Realm.Transaction.Callback() {
+                @Override
+                public void onSuccess() {
+                    Log.i(TAG, "execute: " + System.currentTimeMillis());
+                    mClusterManager.cluster();
 
-            realm.commitTransaction();
-            mClusterManager.cluster();
+                }
+            });
         }
+
 
         if (lat != 0 && lon != 0) {
 
@@ -932,12 +586,6 @@ public class MainMapActivity extends BaseRealmActivity implements NavigationView
                         convenience.setSelected(true);
 
                     setCategory();
-
-                    lat = (float) googleMap.getCameraPosition().target.latitude;
-                    lon = (float) googleMap.getCameraPosition().target.longitude;
-
-                    getData();
-
                 }
             });
         }
@@ -949,18 +597,15 @@ public class MainMapActivity extends BaseRealmActivity implements NavigationView
     }
 
 
-    private void setPCBangData() {
+    private void setPCBangData(int pcBangId) {
+        final Animation animation = AnimationUtils.loadAnimation(
+                this, R.anim.ani_apear_upside);
         customBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
-//        for (int i = 0 ; i < getSupportFragmentManager().getFragments().size() ; i++) {
-//            if (getSupportFragmentManager().getFragments().get(i) instanceof PCBasicFragment) {
-//                ((PCBasicFragment) getSupportFragmentManager().getFragments().get(i)).setData();
-//            } else if (getSupportFragmentManager().getFragments().get(i) instanceof PCPriceFragment) {
-//                ((PCPriceFragment) getSupportFragmentManager().getFragments().get(i)).setData();
-//            } else if (getSupportFragmentManager().getFragments().get(i) instanceof PCReviewFragment) {
-//                ((PCReviewFragment) getSupportFragmentManager().getFragments().get(i)).setData();
-//            }
-//        }
+        ((PCBasicFragment) infoPagerAdapter.getItem(0)).selectedPCBang(pcBangId);
+        ((PCPriceFragment) infoPagerAdapter.getItem(1)).selectedPCBang(pcBangId);
+        ((PCReviewFragment) infoPagerAdapter.getItem(2)).selectedPCBang(pcBangId);
+        ((PCMapFragment) infoPagerAdapter.getItem(3)).selectedPCBang(pcBangId);
     }
 
 
@@ -990,18 +635,14 @@ public class MainMapActivity extends BaseRealmActivity implements NavigationView
 
     @Override
     public boolean onClusterItemClick(PCBangClusterItem pcBangClusterItem) {
-        Log.i("cluster item", "pcBangId : "+pcBangClusterItem.getId());
-        Constant.setPcBangId(pcBangClusterItem.getId());
+        Log.i("cluster item", "click");
+
         deselectMarker();
         selectMarker(pcBangClusterItem);
-        setPCBangData();
+        setPCBangData(pcBangClusterItem.getId());
         vpInfo.setCurrentItem(0);
 
         return false;
-    }
-
-    public int getPCBangId(){
-        return selectedPCBangId;
     }
 
     private void deselectMarker() {
@@ -1009,102 +650,58 @@ public class MainMapActivity extends BaseRealmActivity implements NavigationView
         customBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
 
         if (mSelectedMarker != null) {
-            LinearLayout linearLayout = pcBangRenderer.getLinearLayout();
-            TextView tv_name = (TextView) linearLayout.findViewById(R.id.tv_name);
-            TextView tv_price = (TextView) linearLayout.findViewById(R.id.tv_price);
-
-            IconGenerator mIconGenerator = pcBangRenderer.getmIconGenerator();
+            ImageView imageView = pcBangRenderer.getmImageView();
+            TextView textView = pcBangRenderer.getTextView();
+            IconGenerator iconGenerator = pcBangRenderer.getmIconGenerator();
             Bitmap icon;
-
-            Util.setMarkerLinearLayout(this, linearLayout, selected_alliance_level);
 
             switch (selected_alliance_level) {
                 case 0:
-                    tv_price.setVisibility(View.GONE);
-                    linearLayout.setBackgroundResource(R.drawable.bubble_grey_small);
-                    tv_price.setTextColor(ContextCompat.getColor(this, R.color.colorDarkAccent));
-                    tv_name.setTextColor(ContextCompat.getColor(this, R.color.colorDarkAccent));
+//                    imageView.setImageResource(R.drawable.marker_red_unselected);
+                    textView.setBackgroundResource(R.drawable.marker_unselected);
                     break;
                 case 1:
-                    tv_price.setVisibility(View.VISIBLE);
-                    linearLayout.setBackgroundResource(R.drawable.bubble_grey);
-                    tv_price.setTextColor(ContextCompat.getColor(this, R.color.colorDarkAccent));
-                    tv_name.setTextColor(ContextCompat.getColor(this, R.color.colorDarkAccent));
-
+//                    imageView.setImageResource(R.drawable.marker_red_unselected);
+                    textView.setBackgroundResource(R.drawable.marker_unselected);
                     break;
                 case 2:
-                    linearLayout.setBackgroundResource(R.drawable.bubble_primary);
-                    tv_price.setTextColor(ContextCompat.getColor(this, R.color.white));
-                    tv_name.setTextColor(ContextCompat.getColor(this, R.color.white));
-                    tv_price.setVisibility(View.VISIBLE);
-
+//                    imageView.setImageResource(R.drawable.marker_red_unselected);
+                    textView.setBackgroundResource(R.drawable.marker_unselected);
                     break;
             }
-            try {
-                icon = mIconGenerator.makeIcon();
-                mSelectedMarker.setIcon(BitmapDescriptorFactory.fromBitmap(icon));
-            } catch (IllegalStateException e) {
-                e.printStackTrace();
-            } catch (IllegalArgumentException e) {
-                e.printStackTrace();
-            }
+//            iconGenerator.setContentView(imageView);
+            icon = iconGenerator.makeIcon();
+            mSelectedMarker.setIcon(BitmapDescriptorFactory.fromBitmap(icon));
             mSelectedMarker = null;
         }
     }
 
 
-    private void selectMarker(PCBangClusterItem pcBangClusterItem) {
+    private void selectMarker(PCBangClusterItem pcBangClusterItem){
         customBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
-        IconGenerator mIconGenerator = pcBangRenderer.getmIconGenerator();
-        LinearLayout linearLayout = pcBangRenderer.getLinearLayout();
-
-
-        TextView tv_name = (TextView) linearLayout.findViewById(R.id.tv_name);
-        TextView tv_price = (TextView) linearLayout.findViewById(R.id.tv_price);
-
-        tv_name.setText(pcBangClusterItem.getPcBangName());
-        tv_price.setText("1,200");
-
+        ImageView imageView = pcBangRenderer.getmImageView();
+        TextView textView = pcBangRenderer.getTextView();
+        IconGenerator iconGenerator = pcBangRenderer.getmIconGenerator();
         Bitmap icon;
 
-        int level = pcBangClusterItem.getAllianceLevel();
-
-        // TODO: 2016. 5. 19. level 을 pcBangClusterItem에서 가져온것을 넣어준다.  
-        Random random = new Random();
-        int _level = random.nextInt(3);
-
-        selected_alliance_level = _level;
-        Util.setMarkerLinearLayout(this, linearLayout, selected_alliance_level);
-
-        switch (selected_alliance_level) {
+        switch (pcBangClusterItem.getAllianceLevel()) {
             case 0:
-                linearLayout.setBackgroundResource(R.drawable.bubble_black_small);
-                tv_price.setVisibility(View.GONE);
-                tv_price.setTextColor(ContextCompat.getColor(this, R.color.white));
-                tv_name.setTextColor(ContextCompat.getColor(this, R.color.white));
+                textView.setBackgroundResource(R.drawable.marker_selected);
                 break;
             case 1:
-                linearLayout.setBackgroundResource(R.drawable.bubble_black);
-                tv_price.setVisibility(View.VISIBLE);
-                tv_price.setTextColor(ContextCompat.getColor(this, R.color.white));
-                tv_name.setTextColor(ContextCompat.getColor(this, R.color.white));
-
+                textView.setBackgroundResource(R.drawable.marker_selected);
                 break;
             case 2:
-                linearLayout.setBackgroundResource(R.drawable.bubble_black);
-                tv_price.setTextColor(ContextCompat.getColor(this, R.color.white));
-                tv_name.setTextColor(ContextCompat.getColor(this, R.color.white));
-                tv_price.setVisibility(View.VISIBLE);
-
+                textView.setBackgroundResource(R.drawable.marker_selected);
                 break;
         }
-
-        icon = mIconGenerator.makeIcon();
+        icon = iconGenerator.makeIcon();
 
         mSelectedMarker = pcBangRenderer.getMarker(pcBangClusterItem);
         mSelectedMarker.setIcon(BitmapDescriptorFactory.fromBitmap(icon));
     }
+
 
 
     @Override
@@ -1145,6 +742,10 @@ public class MainMapActivity extends BaseRealmActivity implements NavigationView
 
     private void calculate() {
         VisibleRegion vr = googleMap.getProjection().getVisibleRegion();
+        double left = vr.latLngBounds.southwest.longitude;
+        double top = vr.latLngBounds.northeast.latitude;
+        double right = vr.latLngBounds.northeast.longitude;
+        double bottom = vr.latLngBounds.southwest.latitude;
 
         Location center = new Location("center");
         center.setLatitude(vr.latLngBounds.getCenter().latitude);
@@ -1155,6 +756,7 @@ public class MainMapActivity extends BaseRealmActivity implements NavigationView
 
         float dis = Util.calDistance(center.getLatitude(), center.getLongitude(), center_top.getLatitude(), center_top.getLongitude());
 
+        Log.i(TAG, "calculate: " + dis);
     }
 
 
@@ -1175,15 +777,6 @@ public class MainMapActivity extends BaseRealmActivity implements NavigationView
 
 
     public class InfoPagerAdapter extends FragmentPagerAdapter {
-        private final List<Fragment> mFragmentList = new ArrayList<>();
-        private final List<String> mFragmentTitleList = new ArrayList<>();
-
-        public void addFrag(Fragment fragment, String title){
-            mFragmentList.add(fragment);
-            mFragmentTitleList.add(title);
-        }
-
-
 
         public InfoPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -1191,19 +784,27 @@ public class MainMapActivity extends BaseRealmActivity implements NavigationView
 
         @Override
         public Fragment getItem(int position) {
-
-            return mFragmentList.get(position);
+            switch (position) {
+                case 0:
+                    return PCBasicFragment.newInstance(pcBangId);
+                case 1:
+                    return PCPriceFragment.newInstance(pcBangId);
+                case 2:
+                    return PCReviewFragment.newInstance(pcBangId);
+                case 3:
+                    return PCMapFragment.newInstance(pcBangId);
+            }
+            return null;
         }
-
-
 
         @Override
         public int getCount() {
-            return mFragmentList.size();
+            return 4;
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
+
             return mFragmentTitleList.get(position);
         }
     }
@@ -1239,11 +840,19 @@ public class MainMapActivity extends BaseRealmActivity implements NavigationView
             sliderView.getBundle().putString("extra", name);
 
             slider.addSlider(sliderView);
+=======
+            switch (position) {
+                case 0:
+                    return "기본정보";
+                case 1:
+                    return "요금정보";
+                case 2:
+                    return "후기·별점";
+                case 3:
+                    return "지도보기";
+            }
+            return null;
+>>>>>>> 8f0ecb53c390587510d7d7323714e0c2bcda704d
         }
-
-        slider.setPresetTransformer(SliderLayout.Transformer.Accordion);
-        slider.setPresetIndicator(SliderLayout.PresetIndicators.Center_Bottom);
-        slider.setDuration(4000);
-
     }
 }

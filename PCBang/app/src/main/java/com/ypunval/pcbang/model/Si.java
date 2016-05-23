@@ -9,10 +9,8 @@ public class Si extends RealmObject {
     @PrimaryKey
     private int id;
     private String name;
-    private float latitude;
-    private float longitude;
-    private int pcBangCount;
     private Doe doe;
+    private int pcBangCount;
 
     public int getId() {
         return id;
@@ -22,29 +20,13 @@ public class Si extends RealmObject {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
-    }
+    public String getName() { return name; }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public void setName(String name) { this.name = name; } 
 
-    public float getLatitude() {
-        return latitude;
-    }
+    public Doe getDoe() { return doe; }
 
-    public void setLatitude(float latitude) {
-        this.latitude = latitude;
-    }
-
-    public float getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(float longitude) {
-        this.longitude = longitude;
-    }
+    public void setDoe(Doe doe) { this.doe = doe; }
 
     public int getPcBangCount() {
         return pcBangCount;
@@ -52,13 +34,5 @@ public class Si extends RealmObject {
 
     public void setPcBangCount(int pcBangCount) {
         this.pcBangCount = pcBangCount;
-    }
-
-    public Doe getDoe() {
-        return doe;
-    }
-
-    public void setDoe(Doe doe) {
-        this.doe = doe;
     }
 }

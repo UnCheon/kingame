@@ -178,10 +178,10 @@ public class ResultActivity extends BaseRealmActivity {
     private void getSubwayData(){
         pcBangs.clear();
         Subway subway = realm.where(Subway.class).equalTo("id", id).findFirst();
-        float lat =  subway.getLatitude();
+        float lat =  subway.getLattitude();
         float lon = subway.getLongitude();
 
-        RealmQuery<PCBang> query = realm.where(PCBang.class).equalTo("exist", true);
+        RealmQuery<PCBang> query = realm.where(PCBang.class).equalTo("exsit", true);
         float lat_small = lat - Constant.LATITUDE_CONSTANT * Constant.subwayRangeKm;
         float lat_big = lat + Constant.LATITUDE_CONSTANT * Constant.subwayRangeKm;
 
