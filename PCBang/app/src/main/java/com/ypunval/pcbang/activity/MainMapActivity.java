@@ -1223,7 +1223,7 @@ public class MainMapActivity extends BaseRealmActivity implements NavigationView
 
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, height);
         slider.setLayoutParams(params);
-
+        
 
 
         HashMap<String, String> url_maps = new HashMap<String, String>();
